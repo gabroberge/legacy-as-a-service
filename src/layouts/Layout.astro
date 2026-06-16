@@ -1,0 +1,65 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Legacy-as-a-Service",
+  description = "Scale your technical debt with confidence. Preserve, scale, and monetize your legacy systems.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>{title}</title>
+  </head>
+  <body>
+    <nav class="nav">
+      <a href="#" class="nav__logo">
+        <span class="nav__logo-icon">L</span>
+        Legacy-as-a-Service
+      </a>
+      <ul class="nav__links">
+        <li><a href="#problem">Problem</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#metrics">Metrics</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+      <a href="#cta" class="nav__cta">Request a Demo</a>
+    </nav>
+
+    <slot />
+
+    <footer class="footer">
+      <div class="container footer__inner">
+        <p class="footer__copy">
+          © {new Date().getFullYear()} Legacy-as-a-Service, Inc. All rights indefinitely deferred.
+        </p>
+        <ul class="footer__links">
+          <li><a href="#">Privacy Policy (unread since 2014)</a></li>
+          <li><a href="#">Terms of Indefinite Service</a></li>
+          <li><a href="#">Status Page (green, obviously)</a></li>
+        </ul>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  @import "../styles/global.css";
+</style>

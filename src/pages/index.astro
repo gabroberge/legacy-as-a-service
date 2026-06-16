@@ -1,17 +1,417 @@
 ---
+import Layout from "../layouts/Layout.astro";
 
+const features = [
+  {
+    icon: "🏛️",
+    title: "Convention Preservation Engine",
+    desc: "Automatically detects and locks in your team's most obscure naming patterns, ensuring no future engineer can guess what `tmp_final_v2_REAL` actually does.",
+    tag: "SOC 2 Appendix D",
+  },
+  {
+    icon: "🤖",
+    title: "AI Review Amplifier",
+    desc: "Our ML models generate 47% more low-context review comments, keeping your PRs in perpetual draft state without any human intervention.",
+    tag: "Powered by vibes",
+  },
+  {
+    icon: "⏳",
+    title: "Refactor Deferral Pipeline",
+    desc: "Enterprise-grade CI/CD integration that automatically reschedules refactors to Q4 of every fiscal year, indefinitely.",
+    tag: "99.9% uptime",
+  },
+  {
+    icon: "🧠",
+    title: "Tribal Knowledge Firewall",
+    desc: "Ensures critical system knowledge remains exclusively in the heads of two engineers who haven't responded to Slack since 2022.",
+    tag: "Bus factor: 0",
+  },
+  {
+    icon: "📊",
+    title: "Legacy Compliance Dashboard",
+    desc: "Real-time visibility into how many obsolete conventions you're preserving, with exportable PDFs for board meetings.",
+    tag: "Board-ready",
+  },
+  {
+    icon: "🎭",
+    title: "Migration Theatre Scheduler",
+    desc: "Coordinate quarterly migration kickoffs, architecture reviews, and stakeholder alignment sessions that produce no deliverables.",
+    tag: "Calendar sync",
+  },
+];
+
+const metrics = [
+  { value: "47%", label: "more low-context review comments", color: "purple" },
+  { value: "3.8×", label: "slower onboarding", color: "red" },
+  { value: "12", label: "preserved obsolete conventions", color: "green" },
+  { value: "0", label: "clarified ownership boundaries", color: "muted" },
+  { value: "98%", label: "stakeholder alignment theatre", color: "purple" },
+];
+
+const plans = [
+  {
+    name: "Starter",
+    desc: "One inherited convention",
+    price: "$499",
+    features: [
+      "Single legacy codebase",
+      "1 undocumented API",
+      "Email support (48h SLA)",
+      "Quarterly migration kickoff",
+    ],
+    featured: false,
+  },
+  {
+    name: "Team",
+    desc: "Three conflicting standards",
+    price: "$1,499",
+    features: [
+      "Up to 3 codebases",
+      "Conflicting style guides",
+      "Slack integration (ignored)",
+      "Monthly architecture review",
+      "Tribal knowledge firewall",
+    ],
+    featured: false,
+  },
+  {
+    name: "Enterprise",
+    desc: "Full migration theatre",
+    price: "$4,999",
+    features: [
+      "Unlimited deferred migrations",
+      "Migration theatre scheduler",
+      "Dedicated CSM (also confused)",
+      "SOC 2 Type II theatre",
+      "Custom onboarding (3.8× slower)",
+    ],
+    featured: true,
+  },
+  {
+    name: "Ultimate",
+    desc: "We add a second frontend framework",
+    price: "Custom",
+    features: [
+      "Everything in Enterprise",
+      "Second frontend framework",
+      "Microservices for monolith",
+      "Kubernetes for static site",
+      "White-glove technical debt",
+    ],
+    featured: false,
+  },
+];
+
+const testimonials = [
+  {
+    quote: "We evaluated three modernization vendors and chose Legacy-as-a-Service because they were the only ones who understood that our 2008 PHP monolith is actually a competitive moat.",
+    name: "Derek Holloway",
+    role: "VP of Strategic Inertia, FinServe Global",
+    initials: "DH",
+  },
+  {
+    quote: "Our migration has been 'starting next quarter' for four years now. LaaS gave us the infrastructure to make that a repeatable process.",
+    name: "Priya Menon",
+    role: "Chief Delay Officer, CloudScale Inc.",
+    initials: "PM",
+  },
+  {
+    quote: "The Tribal Knowledge Firewall alone saved us from documenting anything. Our bus factor is now a feature, not a bug.",
+    name: "Marcus Webb",
+    role: "Director of Legacy Excellence, HealthStack",
+    initials: "MW",
+  },
+];
+
+const faqs = [
+  {
+    q: "Can we migrate later?",
+    a: "Absolutely. 'Later' is our most popular deployment timeline. We offer flexible scheduling that automatically pushes your migration to the next planning cycle, every planning cycle, forever.",
+  },
+  {
+    q: "Does this replace our legacy?",
+    a: "No. We replace the anxiety about your legacy. Your codebase stays exactly as it is — we just help you feel strategic about it.",
+  },
+  {
+    q: "Do you support AI?",
+    a: "Yes. Our AI Review Amplifier integrates with your existing workflow to generate context-free suggestions at scale. We also support AI-powered stakeholder alignment theatre.",
+  },
+  {
+    q: "Is this SOC 2 compliant?",
+    a: "We are SOC 2 Type II theatre compliant, meaning we have all the documentation required to discuss compliance in a board meeting without implementing any of it.",
+  },
+  {
+    q: "Can we keep our old naming conventions forever?",
+    a: "Not only can you — our Convention Preservation Engine will actively resist any attempt to change them. `data2_final_new` is safe with us.",
+  },
+];
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero__badge">
+        <span class="hero__badge-dot"></span>
+        Now with 47% more deferred migrations
+      </div>
+      <h1 class="hero__title">
+        Scale your <span>technical debt</span> with confidence.
+      </h1>
+      <p class="hero__desc">
+        Legacy-as-a-Service helps enterprise teams preserve, scale, and monetize
+        their technical debt — without the risk of actually fixing anything.
+      </p>
+      <div class="hero__actions">
+        <a href="#cta" class="btn btn--primary">Request a Migration Delay</a>
+        <a href="#metrics" class="btn btn--secondary">View Technical Debt Dashboard</a>
+      </div>
+
+      <div class="hero__preview">
+        <div class="hero__preview-bar">
+          <span class="hero__preview-dot"></span>
+          <span class="hero__preview-dot"></span>
+          <span class="hero__preview-dot"></span>
+          <span class="hero__preview-title">Technical Debt Dashboard — Production</span>
+        </div>
+        <div class="hero__preview-grid">
+          <div class="hero__preview-card">
+            <div class="hero__preview-card-label">Deferred migrations</div>
+            <div class="hero__preview-card-value hero__preview-card-value--bad">14</div>
+          </div>
+          <div class="hero__preview-card">
+            <div class="hero__preview-card-label">Preserved conventions</div>
+            <div class="hero__preview-card-value hero__preview-card-value--good">12</div>
+          </div>
+          <div class="hero__preview-card">
+            <div class="hero__preview-card-label">Stakeholder alignment</div>
+            <div class="hero__preview-card-value">98%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Problem -->
+  <section class="problem" id="problem">
+    <div class="container">
+      <span class="section-label">The Problem</span>
+      <h2 class="section-title">Modernization is risky.<br />Legacy is predictable.</h2>
+      <p class="section-subtitle">
+        Every quarter, leadership asks about the migration roadmap. Every quarter,
+        you deliver the same answer with more confidence. That's not stagnation — it's
+        operational maturity.
+      </p>
+
+      <div class="problem__grid">
+        <ul class="problem__points">
+          <li class="problem__point">
+            <span class="problem__point-icon">⚠️</span>
+            <div>
+              <h3>Rewrite risk is unbounded</h3>
+              <p>New architectures introduce unknown failure modes. Your current system fails in known, documented ways.</p>
+            </div>
+          </li>
+          <li class="problem__point">
+            <span class="problem__point-icon">📉</span>
+            <div>
+              <h3>Modernization ROI is theoretical</h3>
+              <p>Projected savings assume your team will actually finish. Legacy-as-a-Service assumes they won't.</p>
+            </div>
+          </li>
+          <li class="problem__point">
+            <span class="problem__point-icon">🔒</span>
+            <div>
+              <h3>Technical debt is an asset class</h3>
+              <p>Your inherited conventions represent years of institutional knowledge. Why deprecate an investment?</p>
+            </div>
+          </li>
+        </ul>
+
+        <div class="problem__chart">
+          <div class="problem__chart-title">Predictability Index by Approach</div>
+          <div class="problem__bars">
+            <div class="problem__bar-row">
+              <span class="problem__bar-label">Legacy (LaaS)</span>
+              <div class="problem__bar-track">
+                <div class="problem__bar-fill problem__bar-fill--legacy" style="width: 94%"></div>
+              </div>
+              <span class="problem__bar-value">94%</span>
+            </div>
+            <div class="problem__bar-row">
+              <span class="problem__bar-label">Rewrite</span>
+              <div class="problem__bar-track">
+                <div class="problem__bar-fill problem__bar-fill--modern" style="width: 23%"></div>
+              </div>
+              <span class="problem__bar-value">23%</span>
+            </div>
+            <div class="problem__bar-row">
+              <span class="problem__bar-label">Incremental</span>
+              <div class="problem__bar-track">
+                <div class="problem__bar-fill problem__bar-fill--modern" style="width: 41%"></div>
+              </div>
+              <span class="problem__bar-value">41%</span>
+            </div>
+            <div class="problem__bar-row">
+              <span class="problem__bar-label">"We'll revisit Q4"</span>
+              <div class="problem__bar-track">
+                <div class="problem__bar-fill problem__bar-fill--legacy" style="width: 99%"></div>
+              </div>
+              <span class="problem__bar-value">99%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features">
+    <div class="container">
+      <span class="section-label">Platform</span>
+      <h2 class="section-title">Enterprise-grade debt infrastructure</h2>
+      <p class="section-subtitle">
+        Built for teams who've accepted that the migration is always next quarter.
+      </p>
+
+      <div class="features__grid">
+        {features.map((f) => (
+          <div class="feature-card">
+            <div class="feature-card__icon">{f.icon}</div>
+            <h3>{f.title}</h3>
+            <p>{f.desc}</p>
+            <span class="feature-card__tag">{f.tag}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Metrics -->
+  <section class="metrics" id="metrics">
+    <div class="container">
+      <span class="section-label">Outcomes</span>
+      <h2 class="section-title">Metrics your board will love</h2>
+      <p class="section-subtitle">
+        Real results from teams who stopped pretending they were going to migrate.
+      </p>
+
+      <div class="metrics__dashboard">
+        <div class="metrics__header">
+          <span class="metrics__header-title">Technical Debt Dashboard</span>
+          <span class="metrics__header-status">
+            <span class="hero__badge-dot"></span>
+            All systems nominal
+          </span>
+        </div>
+        <div class="metrics__grid">
+          {metrics.map((m) => (
+            <div class="metric-cell">
+              <div class={`metric-cell__value metric-cell__value--${m.color}`}>{m.value}</div>
+              <div class="metric-cell__label">{m.label}</div>
+            </div>
+          ))}
+        </div>
+        <div class="metrics__footer">
+          <span>Last updated: never (by design)</span>
+          <span>Data source: vibes</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing">
+    <div class="container">
+      <span class="section-label">Pricing</span>
+      <h2 class="section-title">Plans for every stage of denial</h2>
+      <p class="section-subtitle">
+        Transparent pricing. No hidden migration costs — because there is no migration.
+      </p>
+
+      <div class="pricing__grid">
+        {plans.map((plan) => (
+          <div class={`pricing-card ${plan.featured ? "pricing-card--featured" : ""}`}>
+            {plan.featured && <span class="pricing-card__badge">Most Popular</span>}
+            <div class="pricing-card__name">{plan.name}</div>
+            <div class="pricing-card__desc">{plan.desc}</div>
+            <div class="pricing-card__price">
+              {plan.price}
+              {plan.price !== "Custom" && <span>/mo</span>}
+            </div>
+            <ul class="pricing-card__features">
+              {plan.features.map((f) => (
+                <li>{f}</li>
+              ))}
+            </ul>
+            <a href="#cta" class={`btn ${plan.featured ? "btn--primary" : "btn--secondary"}`}>
+              Get started
+            </a>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section>
+    <div class="container">
+      <span class="section-label">Customers</span>
+      <h2 class="section-title">Trusted by teams who've given up gracefully</h2>
+      <p class="section-subtitle">
+        Don't take our word for it. Take theirs — they're very senior.
+      </p>
+
+      <div class="testimonials__grid">
+        {testimonials.map((t) => (
+          <div class="testimonial-card">
+            <p class="testimonial-card__quote">{t.quote}</p>
+            <div class="testimonial-card__author">
+              <div class="testimonial-card__avatar">{t.initials}</div>
+              <div>
+                <div class="testimonial-card__name">{t.name}</div>
+                <div class="testimonial-card__role">{t.role}</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq" id="faq">
+    <div class="container">
+      <span class="section-label">FAQ</span>
+      <h2 class="section-title">Frequently deferred questions</h2>
+
+      <div class="faq__list">
+        {faqs.map((faq) => (
+          <details class="faq__item">
+            <summary class="faq__question">
+              {faq.q}
+              <span class="faq__icon">+</span>
+            </summary>
+            <p class="faq__answer">{faq.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="cta-final" id="cta">
+    <div class="container">
+      <span class="section-label">Get Started</span>
+      <h2 class="section-title">Start your non-migration today.</h2>
+      <p class="section-subtitle">
+        Join 500+ enterprises who've turned "we'll fix it later" into a repeatable,
+        board-approved operating model.
+      </p>
+      <div class="cta-final__actions">
+        <a href="#" class="btn btn--primary">Request a Migration Delay</a>
+        <a href="#" class="btn btn--secondary">Talk to Sales (they're also deferring)</a>
+      </div>
+    </div>
+  </section>
+</Layout>
