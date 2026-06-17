@@ -1,286 +1,287 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import DependencyMap from "../components/DependencyMap.astro";
 
 const features = [
   {
-    icon: "🏛️",
+    id: "CPE",
+    version: "1.8.3",
     title: "Convention Preservation Engine",
-    desc: "Automatically detects and locks in your team's most obscure naming patterns, ensuring no future engineer can guess what `tmp_final_v2_REAL` actually does.",
-    tag: "SOC 2 Appendix D",
+    desc: "Detects and locks obscure naming patterns. `tmp_final_v2_REAL` remains undocumented by design.",
+    status: "live",
+    statusLabel: "Preserving",
   },
   {
-    icon: "🤖",
-    title: "AI Review Amplifier",
-    desc: "Our ML models generate 47% more low-context review comments, keeping your PRs in perpetual draft state without any human intervention.",
-    tag: "Powered by vibes",
+    id: "ARNA",
+    version: "0.9.2-beta",
+    title: "AI Review Noise Amplifier",
+    desc: "Generates low-context review comments at scale. PRs stay in draft without human intervention.",
+    status: "live",
+    statusLabel: "Amplifying",
   },
   {
-    icon: "⏳",
+    id: "RDP",
+    version: "4.0.0-q4",
     title: "Refactor Deferral Pipeline",
-    desc: "Enterprise-grade CI/CD integration that automatically reschedules refactors to Q4 of every fiscal year, indefinitely.",
-    tag: "99.9% uptime",
+    desc: "CI/CD integration that reschedules refactors to Q4 of every fiscal year. Indefinitely.",
+    status: "defer",
+    statusLabel: "Deferred",
   },
   {
-    icon: "🧠",
+    id: "TKF",
+    version: "2.1.0",
     title: "Tribal Knowledge Firewall",
-    desc: "Ensures critical system knowledge remains exclusively in the heads of two engineers who haven't responded to Slack since 2022.",
-    tag: "Bus factor: 0",
+    desc: "Critical knowledge retained in two engineers. Slack last seen: 2022.",
+    status: "deprecated",
+    statusLabel: "Owner unknown",
   },
   {
-    icon: "📊",
+    id: "LCD",
+    version: "3.2.1",
     title: "Legacy Compliance Dashboard",
-    desc: "Real-time visibility into how many obsolete conventions you're preserving, with exportable PDFs for board meetings.",
-    tag: "Board-ready",
+    desc: "Real-time count of preserved obsolete conventions. Board-exportable PDFs.",
+    status: "live",
+    statusLabel: "Reporting",
   },
   {
-    icon: "🎭",
+    id: "MTS",
+    version: "1.0.0",
     title: "Migration Theatre Scheduler",
-    desc: "Coordinate quarterly migration kickoffs, architecture reviews, and stakeholder alignment sessions that produce no deliverables.",
-    tag: "Calendar sync",
+    desc: "Quarterly kickoffs and alignment sessions. Zero deliverables. Full calendar sync.",
+    status: "blocked",
+    statusLabel: "Migration blocked",
   },
 ];
 
 const metrics = [
-  { value: "47%", label: "more low-context review comments", color: "purple" },
-  { value: "3.8×", label: "slower onboarding", color: "red" },
-  { value: "12", label: "preserved obsolete conventions", color: "green" },
-  { value: "0", label: "clarified ownership boundaries", color: "muted" },
-  { value: "98%", label: "stakeholder alignment theatre", color: "purple" },
+  { key: "review_noise", value: "+47%", note: "low-context review comments", tone: "text-amber" },
+  { key: "onboard_dur", value: "3.8x", note: "slower onboarding vs baseline", tone: "text-danger" },
+  { key: "conventions", value: "12", note: "obsolete conventions preserved", tone: "text-terminal" },
+  { key: "ownership", value: "0", note: "clarified ownership boundaries", tone: "text-dim" },
+  { key: "alignment", value: "98%", note: "stakeholder alignment theatre", tone: "text-amber" },
 ];
 
 const plans = [
   {
-    name: "Starter",
+    tier: "Starter",
+    sku: "LaaS-STR-001",
     desc: "One inherited convention",
-    price: "$499",
-    features: [
-      "Single legacy codebase",
-      "1 undocumented API",
-      "Email support (48h SLA)",
-      "Quarterly migration kickoff",
-    ],
+    price: "$499/mo",
+    features: ["Single legacy codebase", "1 undocumented API", "Email support (48h SLA)", "Quarterly migration kickoff"],
     featured: false,
   },
   {
-    name: "Team",
+    tier: "Team",
+    sku: "LaaS-TM-003",
     desc: "Three conflicting standards",
-    price: "$1,499",
-    features: [
-      "Up to 3 codebases",
-      "Conflicting style guides",
-      "Slack integration (ignored)",
-      "Monthly architecture review",
-      "Tribal knowledge firewall",
-    ],
+    price: "$1,499/mo",
+    features: ["Up to 3 codebases", "Conflicting style guides", "Slack integration (ignored)", "Monthly architecture review"],
     featured: false,
   },
   {
-    name: "Enterprise",
+    tier: "Enterprise",
+    sku: "LaaS-ENT-FULL",
     desc: "Full migration theatre",
-    price: "$4,999",
-    features: [
-      "Unlimited deferred migrations",
-      "Migration theatre scheduler",
-      "Dedicated CSM (also confused)",
-      "SOC 2 Type II theatre",
-      "Custom onboarding (3.8× slower)",
-    ],
+    price: "$4,999/mo",
+    features: ["Unlimited deferred migrations", "Migration theatre scheduler", "Dedicated CSM (also confused)", "SOC 2 Type II theatre"],
     featured: true,
   },
   {
-    name: "Ultimate",
-    desc: "We add a second frontend framework",
+    tier: "Ultimate",
+    sku: "LaaS-ULT-CUSTOM",
+    desc: "Second frontend framework included",
     price: "Custom",
-    features: [
-      "Everything in Enterprise",
-      "Second frontend framework",
-      "Microservices for monolith",
-      "Kubernetes for static site",
-      "White-glove technical debt",
-    ],
+    features: ["Everything in Enterprise", "Second frontend framework", "Microservices for monolith", "Kubernetes for static site"],
     featured: false,
   },
 ];
 
 const testimonials = [
   {
-    quote: "We evaluated three modernization vendors and chose Legacy-as-a-Service because they were the only ones who understood that our 2008 PHP monolith is actually a competitive moat.",
+    ref: "AUD-0847",
+    quote: "Our 2008 PHP monolith is a competitive moat. LaaS was the only vendor who didn't argue.",
     name: "Derek Holloway",
-    role: "VP of Strategic Inertia, FinServe Global",
-    initials: "DH",
+    role: "VP Strategic Inertia, FinServe Global",
   },
   {
-    quote: "Our migration has been 'starting next quarter' for four years now. LaaS gave us the infrastructure to make that a repeatable process.",
+    ref: "PROC-1192",
+    quote: "Migration start date: next quarter. Four years running. Now it's a repeatable process.",
     name: "Priya Menon",
     role: "Chief Delay Officer, CloudScale Inc.",
-    initials: "PM",
   },
   {
-    quote: "The Tribal Knowledge Firewall alone saved us from documenting anything. Our bus factor is now a feature, not a bug.",
+    ref: "AUD-0903",
+    quote: "Bus factor reclassified as feature. Documentation requirements eliminated.",
     name: "Marcus Webb",
-    role: "Director of Legacy Excellence, HealthStack",
-    initials: "MW",
+    role: "Director Legacy Excellence, HealthStack",
   },
 ];
 
 const faqs = [
   {
     q: "Can we migrate later?",
-    a: "Absolutely. 'Later' is our most popular deployment timeline. We offer flexible scheduling that automatically pushes your migration to the next planning cycle, every planning cycle, forever.",
+    a: "'Later' is our primary deployment timeline. Scheduling automatically advances to the next planning cycle, every cycle, forever.",
   },
   {
     q: "Does this replace our legacy?",
-    a: "No. We replace the anxiety about your legacy. Your codebase stays exactly as it is — we just help you feel strategic about it.",
+    a: "No. It replaces anxiety about legacy. The codebase stays exactly as it is.",
   },
   {
     q: "Do you support AI?",
-    a: "Yes. Our AI Review Amplifier integrates with your existing workflow to generate context-free suggestions at scale. We also support AI-powered stakeholder alignment theatre.",
+    a: "Yes. AI Review Noise Amplifier produces context-free suggestions at scale. Stakeholder alignment theatre included.",
   },
   {
     q: "Is this SOC 2 compliant?",
-    a: "We are SOC 2 Type II theatre compliant, meaning we have all the documentation required to discuss compliance in a board meeting without implementing any of it.",
+    a: "SOC 2 Type II theatre compliant. Documentation sufficient for board discussion. Implementation optional.",
   },
   {
     q: "Can we keep our old naming conventions forever?",
-    a: "Not only can you — our Convention Preservation Engine will actively resist any attempt to change them. `data2_final_new` is safe with us.",
+    a: "Convention Preservation Engine actively resists modification. `data2_final_new` is protected.",
   },
 ];
+
+const statusTagClass: Record<string, string> = {
+  live: "tag--live",
+  defer: "tag--defer",
+  deprecated: "tag--deprecated",
+  blocked: "tag--blocked",
+};
 ---
 
 <Layout>
   <!-- Hero -->
-  <section class="hero">
-    <div class="container">
-      <div class="hero__badge">
-        <span class="hero__badge-dot"></span>
-        Now with 47% more deferred migrations
-      </div>
-      <h1 class="hero__title">
-        Scale your <span>technical debt</span> with confidence.
-      </h1>
-      <p class="hero__desc">
-        Legacy-as-a-Service helps enterprise teams preserve, scale, and monetize
-        their technical debt — without the risk of actually fixing anything.
-      </p>
-      <div class="hero__actions">
-        <a href="#cta" class="btn btn--primary">Request a Migration Delay</a>
-        <a href="#metrics" class="btn btn--secondary">View Technical Debt Dashboard</a>
-      </div>
+  <section class="relative overflow-hidden pt-36 pb-12 sm:pt-32 sm:pb-16 lg:pt-30">
+    <div class="container-page">
+      <div class="grid items-center gap-8 lg:grid-cols-[1fr_1.1fr] lg:gap-12">
+        <div>
+          <div class="mb-5 flex flex-wrap gap-2">
+            <span class="tag tag--defer"><span class="tag-dot"></span> Q4 Deferral Ready</span>
+            <span class="tag tag--blocked"><span class="tag-dot"></span> Migration Blocked</span>
+            <span class="tag tag--deprecated">unchanged since 2019</span>
+          </div>
+          <h1 class="mb-4 text-[clamp(1.75rem,5.5vw,3.25rem)] leading-[1.12] font-bold tracking-tight">
+            Scale your <em class="text-amber not-italic">technical debt</em> with confidence.
+          </h1>
+          <p class="mb-7 max-w-[440px] text-[0.9375rem] leading-relaxed text-muted sm:text-[1.05rem]">
+            Preserve, scale, and monetize legacy infrastructure — without the
+            risk of actually fixing anything.
+          </p>
+          <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <a href="#cta" class="btn btn-primary w-full sm:w-auto">Request a Migration Delay</a>
+            <a href="#metrics" class="btn btn-secondary w-full sm:w-auto">View Debt Telemetry</a>
+          </div>
+          <div class="flex flex-col gap-1.5 font-mono text-xs text-dim sm:flex-row sm:flex-wrap sm:gap-4">
+            <span class="before:text-amber before:content-['›_']">migration risk: theoretical</span>
+            <span class="before:text-amber before:content-['›_']">owner: unknown</span>
+            <span class="before:text-amber before:content-['›_']">uptime: 99.9% (deferred)</span>
+          </div>
+        </div>
 
-      <div class="hero__preview">
-        <div class="hero__preview-bar">
-          <span class="hero__preview-dot"></span>
-          <span class="hero__preview-dot"></span>
-          <span class="hero__preview-dot"></span>
-          <span class="hero__preview-title">Technical Debt Dashboard — Production</span>
-        </div>
-        <div class="hero__preview-grid">
-          <div class="hero__preview-card">
-            <div class="hero__preview-card-label">Deferred migrations</div>
-            <div class="hero__preview-card-value hero__preview-card-value--bad">14</div>
-          </div>
-          <div class="hero__preview-card">
-            <div class="hero__preview-card-label">Preserved conventions</div>
-            <div class="hero__preview-card-value hero__preview-card-value--good">12</div>
-          </div>
-          <div class="hero__preview-card">
-            <div class="hero__preview-card-label">Stakeholder alignment</div>
-            <div class="hero__preview-card-value">98%</div>
-          </div>
-        </div>
+        <DependencyMap />
       </div>
     </div>
   </section>
 
   <!-- Problem -->
-  <section class="problem" id="problem">
-    <div class="container">
-      <span class="section-label">The Problem</span>
-      <h2 class="section-title">Modernization is risky.<br />Legacy is predictable.</h2>
+  <section class="section-block border-y border-white/7 bg-raised" id="problem">
+    <div class="container-page">
+      <p class="section-eyebrow">The problem</p>
+      <h2 class="section-title">Modernization is risky. Legacy is predictable.</h2>
       <p class="section-subtitle">
-        Every quarter, leadership asks about the migration roadmap. Every quarter,
-        you deliver the same answer with more confidence. That's not stagnation — it's
-        operational maturity.
+        Leadership asks about the migration roadmap each quarter. The answer stays
+        consistent. That is operational maturity.
       </p>
 
-      <div class="problem__grid">
-        <ul class="problem__points">
-          <li class="problem__point">
-            <span class="problem__point-icon">⚠️</span>
-            <div>
-              <h3>Rewrite risk is unbounded</h3>
-              <p>New architectures introduce unknown failure modes. Your current system fails in known, documented ways.</p>
-            </div>
-          </li>
-          <li class="problem__point">
-            <span class="problem__point-icon">📉</span>
-            <div>
-              <h3>Modernization ROI is theoretical</h3>
-              <p>Projected savings assume your team will actually finish. Legacy-as-a-Service assumes they won't.</p>
-            </div>
-          </li>
-          <li class="problem__point">
-            <span class="problem__point-icon">🔒</span>
-            <div>
-              <h3>Technical debt is an asset class</h3>
-              <p>Your inherited conventions represent years of institutional knowledge. Why deprecate an investment?</p>
-            </div>
-          </li>
-        </ul>
-
-        <div class="problem__chart">
-          <div class="problem__chart-title">Predictability Index by Approach</div>
-          <div class="problem__bars">
-            <div class="problem__bar-row">
-              <span class="problem__bar-label">Legacy (LaaS)</span>
-              <div class="problem__bar-track">
-                <div class="problem__bar-fill problem__bar-fill--legacy" style="width: 94%"></div>
-              </div>
-              <span class="problem__bar-value">94%</span>
-            </div>
-            <div class="problem__bar-row">
-              <span class="problem__bar-label">Rewrite</span>
-              <div class="problem__bar-track">
-                <div class="problem__bar-fill problem__bar-fill--modern" style="width: 23%"></div>
-              </div>
-              <span class="problem__bar-value">23%</span>
-            </div>
-            <div class="problem__bar-row">
-              <span class="problem__bar-label">Incremental</span>
-              <div class="problem__bar-track">
-                <div class="problem__bar-fill problem__bar-fill--modern" style="width: 41%"></div>
-              </div>
-              <span class="problem__bar-value">41%</span>
-            </div>
-            <div class="problem__bar-row">
-              <span class="problem__bar-label">"We'll revisit Q4"</span>
-              <div class="problem__bar-track">
-                <div class="problem__bar-fill problem__bar-fill--legacy" style="width: 99%"></div>
-              </div>
-              <span class="problem__bar-value">99%</span>
-            </div>
+      <div class="mt-10 grid gap-px overflow-hidden rounded-[10px] border border-white/12 bg-white/7 lg:grid-cols-2">
+        <div class="bg-panel p-5 sm:p-6 lg:border-r lg:border-white/7">
+          <div class="mb-5 flex flex-wrap items-center justify-between gap-2 border-b border-white/7 pb-3">
+            <span class="font-mono text-[0.7rem] tracking-wider text-terminal uppercase">Legacy (LaaS)</span>
+            <span class="tag tag--live"><span class="tag-dot"></span> Predictable</span>
           </div>
+          <ul class="flex flex-col gap-3.5">
+            <li>
+              <strong class="block text-sm font-semibold">Known failure modes</strong>
+              <p class="text-sm leading-relaxed text-muted">System fails in documented ways. Runbooks exist (unread).</p>
+            </li>
+            <li>
+              <strong class="block text-sm font-semibold">Institutional knowledge</strong>
+              <p class="text-sm leading-relaxed text-muted">Conventions represent years of investment. Deprecation = value destruction.</p>
+            </li>
+            <li>
+              <strong class="block text-sm font-semibold">Migration risk: theoretical</strong>
+              <p class="text-sm leading-relaxed text-muted">Deferred indefinitely. Budget allocated. Nothing shipped.</p>
+            </li>
+          </ul>
+        </div>
+        <div class="bg-panel p-5 sm:p-6">
+          <div class="mb-5 flex flex-wrap items-center justify-between gap-2 border-b border-white/7 pb-3">
+            <span class="font-mono text-[0.7rem] tracking-wider text-danger uppercase">Modernization</span>
+            <span class="tag tag--blocked"><span class="tag-dot"></span> Unbounded risk</span>
+          </div>
+          <ul class="flex flex-col gap-3.5">
+            <li>
+              <strong class="block text-sm font-semibold">Unknown failure modes</strong>
+              <p class="text-sm leading-relaxed text-muted">New architecture introduces surprises. ROI assumes completion.</p>
+            </li>
+            <li>
+              <strong class="block text-sm font-semibold">Rewrite optimism</strong>
+              <p class="text-sm leading-relaxed text-muted">Projected savings require team to actually finish. They won't.</p>
+            </li>
+            <li>
+              <strong class="block text-sm font-semibold">Incremental trap</strong>
+              <p class="text-sm leading-relaxed text-muted">Strangler fig grows for 6 years. Original monolith still processes payments.</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-8 grid gap-4 md:grid-cols-3">
+        <div class="rounded-md border border-white/7 border-l-[3px] border-l-amber bg-panel p-4.5">
+          <h3 class="mb-1.5 text-[0.9375rem] font-semibold">Rewrite risk is unbounded</h3>
+          <p class="text-sm leading-relaxed text-muted">Current system fails predictably. That is a feature.</p>
+        </div>
+        <div class="rounded-md border border-white/7 border-l-[3px] border-l-amber bg-panel p-4.5">
+          <h3 class="mb-1.5 text-[0.9375rem] font-semibold">ROI is theoretical</h3>
+          <p class="text-sm leading-relaxed text-muted">LaaS models for non-completion. Accurate forecasting.</p>
+        </div>
+        <div class="rounded-md border border-white/7 border-l-[3px] border-l-amber bg-panel p-4.5">
+          <h3 class="mb-1.5 text-[0.9375rem] font-semibold">Debt is an asset class</h3>
+          <p class="text-sm leading-relaxed text-muted">Obsolete conventions are preserved product inventory.</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Features -->
-  <section id="features">
-    <div class="container">
-      <span class="section-label">Platform</span>
-      <h2 class="section-title">Enterprise-grade debt infrastructure</h2>
+  <section class="section-block" id="features">
+    <div class="container-page">
+      <p class="section-eyebrow">Control plane</p>
+      <h2 class="section-title">Enterprise debt infrastructure</h2>
       <p class="section-subtitle">
-        Built for teams who've accepted that the migration is always next quarter.
+        Licensed modules for teams who've accepted migration is always next quarter.
       </p>
 
-      <div class="features__grid">
+      <div class="mt-10 overflow-hidden rounded-[10px] border border-white/12 bg-panel">
+        <div class="flex flex-col gap-1 border-b border-white/7 bg-inset px-4 py-2.5 font-mono text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
+          <span>laas-control-plane / modules</span>
+          <span class="text-dim">6 active · 1 blocked · 1 deprecated</span>
+        </div>
         {features.map((f) => (
-          <div class="feature-card">
-            <div class="feature-card__icon">{f.icon}</div>
-            <h3>{f.title}</h3>
-            <p>{f.desc}</p>
-            <span class="feature-card__tag">{f.tag}</span>
+          <div class="grid items-start gap-3 border-b border-white/7 px-4 py-4 transition last:border-b-0 hover:bg-amber/3 sm:gap-4 md:grid-cols-[7rem_1fr_auto]">
+            <div class="font-mono text-xs leading-relaxed text-dim">
+              <code class="block text-[0.8125rem] text-amber">{f.id}</code>
+              v{f.version}
+            </div>
+            <div>
+              <h3 class="mb-1 text-[0.9375rem] font-semibold">{f.title}</h3>
+              <p class="max-w-[52ch] text-sm leading-relaxed text-muted">{f.desc}</p>
+            </div>
+            <div class="flex md:justify-end">
+              <span class={`tag ${statusTagClass[f.status]}`}>
+                {f.status === "live" && <span class="tag-dot"></span>}
+                {f.statusLabel}
+              </span>
+            </div>
           </div>
         ))}
       </div>
@@ -288,129 +289,169 @@ const faqs = [
   </section>
 
   <!-- Metrics -->
-  <section class="metrics" id="metrics">
-    <div class="container">
-      <span class="section-label">Outcomes</span>
-      <h2 class="section-title">Metrics your board will love</h2>
+  <section class="section-block" id="metrics">
+    <div class="container-page">
+      <p class="section-eyebrow">Telemetry</p>
+      <h2 class="section-title">Legacy platform metrics</h2>
       <p class="section-subtitle">
-        Real results from teams who stopped pretending they were going to migrate.
+        Operational data from teams who stopped pretending they'd migrate.
       </p>
 
-      <div class="metrics__dashboard">
-        <div class="metrics__header">
-          <span class="metrics__header-title">Technical Debt Dashboard</span>
-          <span class="metrics__header-status">
-            <span class="hero__badge-dot"></span>
-            All systems nominal
-          </span>
+      <div class="mt-10 overflow-hidden rounded-[10px] border border-white/12 bg-panel">
+        <div class="flex items-center justify-between border-b border-white/7 bg-inset px-4 py-2.5 font-mono text-[0.68rem]">
+          <span>laas-telemetry / production</span>
+          <span class="tag tag--live"><span class="tag-dot"></span> streaming</span>
         </div>
-        <div class="metrics__grid">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5">
           {metrics.map((m) => (
-            <div class="metric-cell">
-              <div class={`metric-cell__value metric-cell__value--${m.color}`}>{m.value}</div>
-              <div class="metric-cell__label">{m.label}</div>
+            <div class="telemetry-cell relative border-b border-white/7 p-4 sm:p-5 last:border-b-0 odd:max-md:border-r max-md:[&:nth-child(-n+2)]:border-b md:border-r md:border-b-0 md:last:border-r-0">
+              <div class="mb-2 font-mono text-[0.65rem] tracking-wider text-dim uppercase sm:text-xs">{m.key}</div>
+              <div class={`relative z-10 mb-1 text-xl font-bold tracking-tight sm:text-[1.65rem] ${m.tone}`}>{m.value}</div>
+              <div class="relative z-10 text-xs leading-snug text-muted sm:text-[0.8125rem]">{m.note}</div>
             </div>
           ))}
         </div>
-        <div class="metrics__footer">
-          <span>Last updated: never (by design)</span>
-          <span>Data source: vibes</span>
+        <div class="flex flex-wrap justify-between gap-2 border-t border-white/7 px-4 py-2 font-mono text-[0.62rem] text-dim">
+          <span>last_sync: never (by design)</span>
+          <span>source: internal_estimates.vibes</span>
+          <span>retention: indefinite</span>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Pricing -->
-  <section id="pricing">
-    <div class="container">
-      <span class="section-label">Pricing</span>
-      <h2 class="section-title">Plans for every stage of denial</h2>
+  <section class="section-block" id="pricing">
+    <div class="container-wide">
+      <p class="section-eyebrow">Pricing</p>
+      <h2 class="section-title">Enterprise procurement schedule</h2>
       <p class="section-subtitle">
-        Transparent pricing. No hidden migration costs — because there is no migration.
+        Annual contracts. No migration costs — because there is no migration.
       </p>
 
-      <div class="pricing__grid">
+      <!-- Mobile cards -->
+      <div class="mt-10 flex flex-col gap-4 md:hidden">
         {plans.map((plan) => (
-          <div class={`pricing-card ${plan.featured ? "pricing-card--featured" : ""}`}>
-            {plan.featured && <span class="pricing-card__badge">Most Popular</span>}
-            <div class="pricing-card__name">{plan.name}</div>
-            <div class="pricing-card__desc">{plan.desc}</div>
-            <div class="pricing-card__price">
-              {plan.price}
-              {plan.price !== "Custom" && <span>/mo</span>}
+          <div class={`rounded-[10px] border bg-panel p-5 ${plan.featured ? "border-amber/50" : "border-white/12"}`}>
+            <div class="mb-1 flex items-center justify-between gap-2">
+              <div class="text-base font-bold">{plan.tier}</div>
+              {plan.featured && <span class="tag tag--defer">Recommended</span>}
             </div>
-            <ul class="pricing-card__features">
+            <div class="mb-2 font-mono text-xs text-dim">{plan.sku}</div>
+            <p class="mb-3 text-sm text-muted">{plan.desc}</p>
+            <div class="mb-4 text-2xl font-bold text-amber">{plan.price}</div>
+            <ul class="pricing-row mb-4 text-sm text-muted">
               {plan.features.map((f) => (
-                <li>{f}</li>
+                <li class="py-0.5">{f}</li>
               ))}
             </ul>
-            <a href="#cta" class={`btn ${plan.featured ? "btn--primary" : "btn--secondary"}`}>
-              Get started
+            <a href="#cta" class={`btn w-full ${plan.featured ? "btn-primary" : "btn-secondary"}`}>
+              {plan.featured ? "Select" : "Evaluate"}
             </a>
           </div>
         ))}
+      </div>
+
+      <!-- Desktop table -->
+      <div class="mt-10 hidden overflow-x-auto rounded-[10px] border border-white/12 bg-panel md:block">
+        <table class="w-full min-w-[700px] border-collapse text-sm">
+          <thead>
+            <tr>
+              <th class="border-b border-white/7 bg-inset px-4 py-3 text-left font-mono text-[0.65rem] font-medium tracking-wider text-muted uppercase">Tier</th>
+              <th class="border-b border-white/7 bg-inset px-4 py-3 text-left font-mono text-[0.65rem] font-medium tracking-wider text-muted uppercase">Scope</th>
+              <th class="border-b border-white/7 bg-inset px-4 py-3 text-left font-mono text-[0.65rem] font-medium tracking-wider text-muted uppercase">Rate</th>
+              <th class="border-b border-white/7 bg-inset px-4 py-3 text-left font-mono text-[0.65rem] font-medium tracking-wider text-muted uppercase">Inclusions</th>
+              <th class="border-b border-white/7 bg-inset px-4 py-3"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {plans.map((plan) => (
+              <tr class={`pricing-row transition hover:bg-amber/2 ${plan.featured ? "[&>td:first-child]:border-l-2 [&>td:first-child]:border-l-amber" : ""}`}>
+                <td class="border-b border-white/7 px-4 py-4 align-top last:border-b-0">
+                  <div class="text-[0.95rem] font-semibold">{plan.tier}</div>
+                  <div class="mt-0.5 font-mono text-[0.65rem] text-dim">{plan.sku}</div>
+                </td>
+                <td class="border-b border-white/7 px-4 py-4 align-top text-xs text-muted last:border-b-0">{plan.desc}</td>
+                <td class="border-b border-white/7 px-4 py-4 align-top text-xl font-semibold text-amber last:border-b-0">{plan.price}</td>
+                <td class="border-b border-white/7 px-4 py-4 align-top last:border-b-0">
+                  <ul class="text-[0.78rem] text-muted">
+                    {plan.features.map((f) => (
+                      <li class="py-0.5">{f}</li>
+                    ))}
+                  </ul>
+                </td>
+                <td class="border-b border-white/7 px-4 py-4 align-top last:border-b-0">
+                  <a href="#cta" class={`btn text-xs! px-3.5! py-2! ${plan.featured ? "btn-primary" : "btn-secondary"}`}>
+                    {plan.featured ? "Select" : "Evaluate"}
+                  </a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   </section>
 
   <!-- Testimonials -->
-  <section>
-    <div class="container">
-      <span class="section-label">Customers</span>
-      <h2 class="section-title">Trusted by teams who've given up gracefully</h2>
-      <p class="section-subtitle">
-        Don't take our word for it. Take theirs — they're very senior.
-      </p>
+  <section class="section-block">
+    <div class="container-page">
+      <p class="section-eyebrow">Customer notes</p>
+      <h2 class="section-title">Procurement excerpts</h2>
+      <p class="section-subtitle">Unedited. Very senior.</p>
 
-      <div class="testimonials__grid">
+      <div class="mt-10 grid gap-4 md:grid-cols-3">
         {testimonials.map((t) => (
-          <div class="testimonial-card">
-            <p class="testimonial-card__quote">{t.quote}</p>
-            <div class="testimonial-card__author">
-              <div class="testimonial-card__avatar">{t.initials}</div>
-              <div>
-                <div class="testimonial-card__name">{t.name}</div>
-                <div class="testimonial-card__role">{t.role}</div>
-              </div>
-            </div>
-          </div>
+          <blockquote class="relative rounded-md border border-white/7 bg-panel p-5">
+            <span class="absolute top-3 right-3 font-mono text-xs text-dim">{t.ref}</span>
+            <p class="mb-4 text-[0.9375rem] leading-relaxed text-muted italic">"{t.quote}"</p>
+            <footer class="text-sm">
+              <div class="font-semibold text-[#e8eaef]">{t.name}</div>
+              <div class="text-xs text-dim">{t.role}</div>
+            </footer>
+          </blockquote>
         ))}
       </div>
     </div>
   </section>
 
   <!-- FAQ -->
-  <section class="faq" id="faq">
-    <div class="container">
-      <span class="section-label">FAQ</span>
+  <section class="section-block border-t border-white/7 bg-raised" id="faq">
+    <div class="container-page">
+      <p class="section-eyebrow">FAQ</p>
       <h2 class="section-title">Frequently deferred questions</h2>
 
-      <div class="faq__list">
-        {faqs.map((faq) => (
-          <details class="faq__item">
-            <summary class="faq__question">
-              {faq.q}
-              <span class="faq__icon">+</span>
+      <div class="mt-8 max-w-[680px]">
+        {faqs.map((faq, i) => (
+          <details class="faq-item border-b border-white/7">
+            <summary class="flex cursor-pointer list-none items-start justify-between gap-3 py-4 text-[0.9375rem] font-semibold sm:items-center">
+              <span class="min-w-0">
+                <span class="mr-2 font-mono text-xs text-amber sm:mr-3">0{i + 1}</span>
+                {faq.q}
+              </span>
+              <span class="faq-icon shrink-0 font-mono text-dim transition">+</span>
             </summary>
-            <p class="faq__answer">{faq.a}</p>
+            <p class="pb-4 pl-0 text-sm leading-relaxed text-muted sm:pl-6">{faq.a}</p>
           </details>
         ))}
       </div>
     </div>
   </section>
 
-  <!-- Final CTA -->
-  <section class="cta-final" id="cta">
-    <div class="container">
-      <span class="section-label">Get Started</span>
-      <h2 class="section-title">Start your non-migration today.</h2>
-      <p class="section-subtitle">
-        Join 500+ enterprises who've turned "we'll fix it later" into a repeatable,
-        board-approved operating model.
-      </p>
-      <div class="cta-final__actions">
-        <a href="#" class="btn btn--primary">Request a Migration Delay</a>
-        <a href="#" class="btn btn--secondary">Talk to Sales (they're also deferring)</a>
+  <!-- CTA -->
+  <section class="section-block text-center" id="cta">
+    <div class="container-page">
+      <div class="relative mx-auto max-w-[640px] overflow-hidden rounded-[10px] border border-white/12 bg-panel px-5 py-8 sm:px-8 sm:py-10 before:absolute before:inset-x-0 before:top-0 before:h-0.5 before:bg-linear-to-r before:from-transparent before:via-amber before:to-transparent">
+        <p class="section-eyebrow">Get started</p>
+        <h2 class="section-title">Start your non-migration today.</h2>
+        <p class="section-subtitle mx-auto mb-6 text-center">
+          Turn "we'll fix it later" into a board-approved operating model.
+        </p>
+        <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
+          <a href="#" class="btn btn-primary w-full sm:w-auto">Request a Migration Delay</a>
+          <a href="#" class="btn btn-secondary w-full sm:w-auto">Contact Sales</a>
+        </div>
+        <p class="mt-4 font-mono text-xs text-dim">Processing time: one fiscal quarter minimum · Form LaaS-001</p>
       </div>
     </div>
   </section>
