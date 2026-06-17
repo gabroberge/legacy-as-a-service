@@ -145,13 +145,15 @@ Be kind. Be professional. Do not actually migrate anything.
 
 Harassment, hate speech, and earnest attempts to modernize the stack without preserving at least one undocumented convention are not welcome.
 
+Full policy: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+
 ---
 
 ## Questions
 
 Open an issue. It will be classified appropriately.
 
-For licensing, see [LICENSE](LICENSE). For the executive version of this document, see [README](README.md).
+For licensing, see [LICENSE](LICENSE). For the executive version of this document, see [README](README.md). Changelog: [CHANGELOG.md](CHANGELOG.md).
 
 <p align="center">
   <sub>Thank you for deferring with us.</sub>

@@ -83,7 +83,7 @@ Formal folder documentation deferred to Q4 FY2027. Alignment scheduled quarterly
 
 ## Contributing
 
-PRs welcome if they increase fidelity to real enterprise dysfunction. See [CONTRIBUTING.md](CONTRIBUTING.md) for the full deferral pipeline. Security policy: [SECURITY.md](SECURITY.md).
+PRs welcome if they increase fidelity to real enterprise dysfunction. See [CONTRIBUTING.md](CONTRIBUTING.md) for the full deferral pipeline. [Code of Conduct](CODE_OF_CONDUCT.md) · [Security](SECURITY.md) · [Changelog](CHANGELOG.md)
 
 | Report | Classification |
 | :--- | :--- |
