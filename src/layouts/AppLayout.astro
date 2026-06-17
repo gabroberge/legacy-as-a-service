@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import { sitePath } from "../lib/site-url";
 
 interface Props {
   title?: string;
@@ -21,7 +22,7 @@ const tabs = [
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href={sitePath("/favicon.svg")} />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -35,14 +36,14 @@ const tabs = [
   <body class="min-h-screen">
     <header class="sticky top-0 z-50 border-b border-white/7 bg-bg/95 backdrop-blur-sm">
       <div class="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
-        <a href="/app" class="flex min-w-0 items-center gap-2 font-semibold">
+        <a href={sitePath("/app")} class="flex min-w-0 items-center gap-2 font-semibold">
           <span class="grid size-7 shrink-0 place-items-center border border-amber bg-amber/15 font-mono text-[0.7rem] font-bold text-amber">L</span>
           <span class="truncate text-sm sm:text-base">LaaS Control Plane</span>
           <span class="tag tag--live hidden sm:inline-flex"><span class="tag-dot"></span> live</span>
         </a>
         <div class="flex items-center gap-2">
           <span class="hidden font-mono text-xs text-dim sm:inline">v2.4.1 · local-first</span>
-          <a href="/" class="btn btn-secondary px-3 py-2 text-xs!">← Marketing</a>
+          <a href={sitePath("/")} class="btn btn-secondary px-3 py-2 text-xs!">← Marketing</a>
         </div>
       </div>
     </header>

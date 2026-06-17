@@ -1,6 +1,7 @@
 ---
 import DependencyMap from "../components/DependencyMap.astro";
 import Layout from "../layouts/Layout.astro";
+import { sitePath } from "../lib/site-url";
 import { COMPLIANCE_BADGES, DASHBOARD_METRICS } from "../lib/content-pool";
 
 const metrics = DASHBOARD_METRICS.slice(0, 5);
@@ -163,7 +164,7 @@ const statusTagClass: Record<string, string> = {
             risk of actually fixing anything.
           </p>
           <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <a href="/app" class="btn btn-primary w-full sm:w-auto">Open Control Plane</a>
+            <a href={sitePath("/app")} class="btn btn-primary w-full sm:w-auto">Open Control Plane</a>
             <a href="#metrics" class="btn btn-secondary w-full sm:w-auto">View Debt Telemetry</a>
           </div>
           <div class="flex flex-col gap-1.5 font-mono text-xs text-dim sm:flex-row sm:flex-wrap sm:gap-4">

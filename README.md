@@ -5,6 +5,8 @@
 > **Bus factor:** 1.2  
 > **This repository is absurd by design.** That is the initialization requirement.
 
+**Live demo:** https://gabroberge.github.io/legacy-as-a-service/ (staging parity not guaranteed)
+
 ---
 
 ## Executive summary

@@ -22,3 +22,9 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Security credentials
+*.pem
+*.key
+credentials.json
+secrets.json
