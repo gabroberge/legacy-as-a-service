@@ -1,7 +1,7 @@
 name: Enhancement / Content
 description: Propose new enterprise theatre — blockers, copy, conventions, refactors.
 title: "[ENHANCEMENT] "
-labels: []
+labels: ["enhancement", "q4"]
 body:
   - type: markdown
     attributes:

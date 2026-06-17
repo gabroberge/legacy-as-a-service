@@ -17,6 +17,7 @@ Versioning is aspirational. Migration is blocked.
 
 ### Added
 
+- GitHub labels (`noise`, `feature: blocked`, `convention`, `q4`, `working-as-designed`, …) with sync workflow
 - GitHub issue templates, PR template, and SECURITY.md
 - CI: build + Vitest suite verifying migration remains blocked
 - `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `CHANGELOG.md`, sponsor button

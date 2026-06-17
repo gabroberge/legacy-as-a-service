@@ -36,6 +36,21 @@ All reports are triaged using the official LaaS incident taxonomy:
 
 If your issue does not fit, it will be classified as **noise** (62% load-bearing metric).
 
+### GitHub labels
+
+Labels sync from [`.github/labels.json`](.github/labels.json) on push. Suggested triage mapping:
+
+| Classification | Label |
+| :--- | :--- |
+| Feature — migration blocked | `feature: blocked`, `working-as-designed` |
+| Feature — refactor deferred | `q4` |
+| Feature — AI review lacks context | `noise` |
+| Convention — preserve as-is | `convention` |
+| Incident — staging parity | `incident` |
+| Noise | `noise` |
+
+Maintainers may re-label. Appeals deferred to Q4.
+
 ---
 
 ## Pull requests we want

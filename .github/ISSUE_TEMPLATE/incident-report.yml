@@ -1,7 +1,7 @@
 name: Incident Report
 description: File an incident. 62% are classified as noise (load-bearing metric).
 title: "[INCIDENT] "
-labels: []
+labels: ["incident", "triage"]
 body:
   - type: markdown
     attributes:

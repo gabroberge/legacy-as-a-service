@@ -1,0 +1,24 @@
+name: Sync labels
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/labels.json
+      - .github/workflows/labels.yml
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  sync:
+    name: Classify repository folklore
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: EndBug/label-sync@v2
+        with:
+          config-file: .github/labels.json
+          delete-other-labels: false
