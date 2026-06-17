@@ -1,142 +1,140 @@
-const STORAGE_KEY = "laas-dep-map-positions";
-const VB = { w: 480, h: 300 };
-const MIGRATION_HOME = { x: 330, y: 45 };
+import { LEGACY_SYSTEM_NAMES, pick } from "../lib/content-pool";
+import { measureNode } from "../lib/dep-node-layout";
+import { formatIncidentTs } from "../lib/incident-format";
+import {
+  addIncident,
+  commit,
+  deferMigration,
+  getState,
+  resetNodes,
+  simplifyArchitectureAction,
+  subscribe,
+  type LegacyNode,
+} from "../lib/legacy-state";
+
+const MIN_VB = { w: 900, h: 600 };
+const EXPAND_PAD = 72;
+const MIGRATION_HOME = { x: 500, y: 72 };
 const SNAP_SPEED = 0.06;
 const COUPLING_THRESHOLD = 0.25;
 
-type NodeVariant = "default" | "deprecated" | "blocked";
+type NodeVariant = LegacyNode["variant"];
 
-interface NodeData {
-  id: string;
-  label: string;
-  ver: string;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  variant: NodeVariant;
-  verDanger?: boolean;
-}
-
-const DEFAULT_NODES: NodeData[] = [
-  { id: "monolith-core", label: "monolith-core", ver: "v3.14.159 · deprecated", x: 60, y: 55, w: 120, h: 44, variant: "deprecated" },
-  { id: "api-gateway", label: "api-gateway", ver: "owner: unknown", x: 160, y: 35, w: 110, h: 44, variant: "default" },
-  { id: "tmp_service_FINAL", label: "tmp_service_FINAL", ver: "since 2016", x: 250, y: 65, w: 130, h: 44, variant: "default" },
-  { id: "migration-target", label: "migration-target", ver: "status: blocked", x: 330, y: 45, w: 120, h: 44, variant: "blocked", verDanger: true },
-  { id: "cron-v1-backup", label: "cron-v1-backup", ver: "do not remove", x: 60, y: 140, w: 120, h: 44, variant: "deprecated" },
-  { id: "auth-legacy", label: "auth-legacy", ver: "MD5 · working", x: 160, y: 160, w: 110, h: 44, variant: "default" },
-  { id: "data2_final_new", label: "data2_final_new", ver: "preserved asset", x: 250, y: 180, w: 130, h: 44, variant: "default" },
-  { id: "kafka-maybe", label: "kafka-maybe", ver: "provisioned never", x: 330, y: 200, w: 120, h: 44, variant: "default" },
-];
-
-const INITIAL_LOGS: { level: "ok" | "warn" | "blocked"; text: string }[] = [
-  { level: "ok", text: "convention_preservation_engine: 12 assets locked" },
-  { level: "warn", text: "migration_path: loop detected → origin" },
-  { level: "blocked", text: "refactor_pipeline: rescheduled to Q4 FY2026" },
-];
-
-const LOG_CLASS = { ok: "text-terminal", warn: "text-amber", blocked: "text-danger" };
-const LOG_LABEL = { ok: "[OK]", warn: "[WARN]", blocked: "[BLOCKED]" };
-
-function center(n: NodeData) {
+function center(n: LegacyNode) {
   return { x: n.x + n.w / 2, y: n.y + n.h / 2 };
 }
 
-function getJunction(nodes: Map<string, NodeData>) {
+function getJunction(nodes: Map<string, LegacyNode>) {
   const mig = center(nodes.get("migration-target")!);
   const kafka = center(nodes.get("kafka-maybe")!);
-  return {
-    x: (mig.x + kafka.x) / 2,
-    y: mig.y + (kafka.y - mig.y) * 0.35,
-  };
+  return { x: (mig.x + kafka.x) / 2, y: mig.y + (kafka.y - mig.y) * 0.35 };
 }
 
-function defaultNodes(): Map<string, NodeData> {
-  return new Map(DEFAULT_NODES.map((n) => [n.id, { ...n }]));
+function nodesMap(): Map<string, LegacyNode> {
+  return new Map(getState().nodes.map((n) => [n.id, { ...n }]));
 }
 
-function loadPositions(): Map<string, NodeData> {
-  const map = defaultNodes();
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return map;
-    const saved = JSON.parse(raw) as Record<string, { x: number; y: number }>;
-    for (const [id, pos] of Object.entries(saved)) {
-      const node = map.get(id);
-      if (node && id !== "migration-target") {
-        node.x = pos.x;
-        node.y = pos.y;
-      }
-    }
-  } catch {
-    /* ignore */
+function persistNodes(nodes: Map<string, LegacyNode>) {
+  commit((s) => {
+    s.nodes = [...nodes.values()];
+  });
+}
+
+function clampNode(n: LegacyNode, bounds: { w: number; h: number }) {
+  n.x = Math.max(0, Math.min(bounds.w - n.w, n.x));
+  n.y = Math.max(0, Math.min(bounds.h - n.h, n.y));
+}
+
+function computeBounds(
+  nodes: Map<string, LegacyNode>,
+  viewportW: number,
+): { w: number; h: number } {
+  let w = Math.max(MIN_VB.w, viewportW);
+  let h = MIN_VB.h;
+  for (const n of nodes.values()) {
+    w = Math.max(w, n.x + n.w + EXPAND_PAD);
+    h = Math.max(h, n.y + n.h + EXPAND_PAD);
   }
-  return map;
+  return { w, h };
 }
 
-function savePositions(nodes: Map<string, NodeData>) {
-  const out: Record<string, { x: number; y: number }> = {};
-  for (const [id, n] of nodes) {
-    if (id !== "migration-target") out[id] = { x: n.x, y: n.y };
-  }
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(out));
-}
-
-function clampNode(n: NodeData) {
-  n.x = Math.max(0, Math.min(VB.w - n.w, n.x));
-  n.y = Math.max(0, Math.min(VB.h - n.h, n.y));
-}
-
-function rectsOverlap(a: NodeData, b: NodeData): boolean {
+function rectsOverlap(a: LegacyNode, b: LegacyNode) {
   const ox = Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x));
   const oy = Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
-  const overlap = ox * oy;
-  const minArea = Math.min(a.w * a.h, b.w * b.h);
-  return overlap / minArea > COUPLING_THRESHOLD;
+  return (ox * oy) / Math.min(a.w * a.h, b.w * b.h) > COUPLING_THRESHOLD;
 }
 
-function initMap(root: HTMLElement) {
-  if (root.dataset.depInit === "true") return;
-  root.dataset.depInit = "true";
+const activeCouplings = new WeakMap<HTMLElement, Set<string>>();
 
+function initMap(root: HTMLElement) {
   const svg = root.querySelector<SVGSVGElement>(".dep-map-svg")!;
   const edgesG = root.querySelector<SVGGElement>("[data-dep-edges]")!;
   const nodesG = root.querySelector<SVGGElement>("[data-dep-nodes]")!;
-  const blockedG = root.querySelector<SVGGElement>("[data-dep-blocked]")!;
-  const logEl = root.querySelector<HTMLElement>("[data-dep-log]")!;
   const dragBadge = root.querySelector<HTMLElement>("[data-drag-badge]")!;
   const toast = root.querySelector<HTMLElement>("[data-toast]")!;
+  const blockedToast = root.querySelector<HTMLElement>("[data-blocked-toast]");
   const canvas = root.querySelector<HTMLElement>(".dep-map-canvas")!;
-  const resetBtn = root.querySelector<HTMLButtonElement>(".dep-map-reset")!;
-  const autoLayoutBtn = root.querySelector<HTMLButtonElement>(".dep-map-autolayout")!;
-  const simplifyBtn = root.querySelector<HTMLButtonElement>(".dep-map-simplify")!;
-  const migrateBtn = root.querySelector<HTMLButtonElement>(".dep-map-migrate")!;
+  const viewport = root.querySelector<HTMLElement>("[data-dep-viewport]")!;
+  const logEl = root.querySelector<HTMLElement>("[data-dep-log]");
 
-  let nodes = loadPositions();
+  let nodes = nodesMap();
+  let bounds = computeBounds(nodes, viewport.clientWidth);
   let dragging: { id: string; offsetX: number; offsetY: number; el: SVGGElement } | null = null;
+  let panning: { startX: number; startY: number; scrollLeft: number; scrollTop: number } | null = null;
   let migrationAnim: number | null = null;
-  let simplifyCount = 0;
-  const nodeEls = new Map<string, SVGGElement>();
-  const activeCouplings = new Set<string>();
   let toastTimer: ReturnType<typeof setTimeout> | null = null;
+  const nodeEls = new Map<string, SVGGElement>();
+  const couplings = activeCouplings.get(root) ?? new Set<string>();
+  activeCouplings.set(root, couplings);
 
-  function appendLog(level: keyof typeof LOG_CLASS, text: string) {
-    const p = document.createElement("p");
-    p.innerHTML = `<span class="${LOG_CLASS[level]}">${LOG_LABEL[level]}</span> ${text}`;
-    logEl.appendChild(p);
-    logEl.scrollTop = logEl.scrollHeight;
+  const mapBg = svg.querySelector<SVGRectElement>(".dep-map-bg");
+
+  function updateCanvasSize() {
+    bounds = computeBounds(nodes, viewport.clientWidth || MIN_VB.w);
+    svg.setAttribute("viewBox", `0 0 ${bounds.w} ${bounds.h}`);
+    svg.setAttribute("width", String(bounds.w));
+    svg.setAttribute("height", String(bounds.h));
+    mapBg?.setAttribute("width", String(bounds.w));
+    mapBg?.setAttribute("height", String(bounds.h));
   }
 
-  function renderLogs() {
-    logEl.innerHTML = "";
-    for (const line of INITIAL_LOGS) appendLog(line.level, line.text);
+  function ensureRoom(n: LegacyNode) {
+    const needW = n.x + n.w + EXPAND_PAD;
+    const needH = n.y + n.h + EXPAND_PAD;
+    const floorW = Math.max(MIN_VB.w, viewport.clientWidth || MIN_VB.w);
+    if (needW > bounds.w || needH > bounds.h || bounds.w < floorW) {
+      bounds = {
+        w: Math.max(bounds.w, needW, floorW),
+        h: Math.max(bounds.h, needH, MIN_VB.h),
+      };
+      svg.setAttribute("viewBox", `0 0 ${bounds.w} ${bounds.h}`);
+      svg.setAttribute("width", String(bounds.w));
+      svg.setAttribute("height", String(bounds.h));
+      mapBg?.setAttribute("width", String(bounds.w));
+      mapBg?.setAttribute("height", String(bounds.h));
+    }
   }
 
   function showToast(msg: string) {
+    if (!toast) return;
     toast.textContent = msg;
     toast.classList.remove("hidden");
     if (toastTimer) clearTimeout(toastTimer);
     toastTimer = setTimeout(() => toast.classList.add("hidden"), 2800);
+  }
+
+  function positionBlockedToast() {
+    if (!blockedToast || !nodes.has("migration-target")) {
+      blockedToast?.classList.add("hidden");
+      return;
+    }
+    const el = nodeEls.get("migration-target");
+    if (!el) return;
+    const nodeRect = el.getBoundingClientRect();
+    const canvasRect = canvas.getBoundingClientRect();
+    blockedToast.style.left = `${nodeRect.right - canvasRect.left + 8}px`;
+    blockedToast.style.top = `${nodeRect.top - canvasRect.top + nodeRect.height / 2 - 14}px`;
+    blockedToast.classList.remove("hidden");
   }
 
   function svgPoint(clientX: number, clientY: number) {
@@ -145,8 +143,7 @@ function initMap(root: HTMLElement) {
     pt.y = clientY;
     const ctm = svg.getScreenCTM();
     if (!ctm) return { x: 0, y: 0 };
-    const p = pt.matrixTransform(ctm.inverse());
-    return { x: p.x, y: p.y };
+    return pt.matrixTransform(ctm.inverse());
   }
 
   function variantClass(variant: NodeVariant) {
@@ -162,6 +159,7 @@ function initMap(root: HTMLElement) {
   }
 
   function positionDragBadge(clientX: number, clientY: number) {
+    if (!dragBadge) return;
     const rect = canvas.getBoundingClientRect();
     dragBadge.style.left = `${clientX - rect.left + 12}px`;
     dragBadge.style.top = `${clientY - rect.top - 28}px`;
@@ -175,12 +173,12 @@ function initMap(root: HTMLElement) {
         const b = nodes.get(ids[j])!;
         const key = [ids[i], ids[j]].sort().join("|");
         if (rectsOverlap(a, b)) {
-          if (!activeCouplings.has(key)) {
-            activeCouplings.add(key);
-            appendLog("warn", "accidental coupling detected");
+          if (!couplings.has(key)) {
+            couplings.add(key);
+            addIncident("warn", "accidental coupling detected");
           }
         } else {
-          activeCouplings.delete(key);
+          couplings.delete(key);
         }
       }
     }
@@ -197,7 +195,6 @@ function initMap(root: HTMLElement) {
     stopMigrationSnap();
     const n = nodes.get("migration-target");
     if (!n) return;
-
     const tick = () => {
       const dx = MIGRATION_HOME.x - n.x;
       const dy = MIGRATION_HOME.y - n.y;
@@ -206,14 +203,17 @@ function initMap(root: HTMLElement) {
         n.y = MIGRATION_HOME.y;
         updateNodeTransform("migration-target");
         renderEdges();
+        positionBlockedToast();
         migrationAnim = null;
+        persistNodes(nodes);
         return;
       }
       n.x += dx * SNAP_SPEED;
       n.y += dy * SNAP_SPEED;
-      clampNode(n);
+      clampNode(n, bounds);
       updateNodeTransform("migration-target");
       renderEdges();
+      positionBlockedToast();
       migrationAnim = requestAnimationFrame(tick);
     };
     migrationAnim = requestAnimationFrame(tick);
@@ -223,28 +223,45 @@ function initMap(root: HTMLElement) {
     nodesG.innerHTML = "";
     nodeEls.clear();
     for (const n of nodes.values()) {
+      const { w, h, displayLabel, displayVer } = measureNode(n.label, n.ver);
+      n.w = w;
+      n.h = h;
+
       const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
       g.setAttribute("class", variantClass(n.variant));
       g.setAttribute("transform", `translate(${n.x}, ${n.y})`);
-      g.dataset.nodeId = n.id;
+
+      const clipId = `dep-clip-${n.id.replace(/[^a-z0-9-]/gi, "")}`;
+      const clip = document.createElementNS("http://www.w3.org/2000/svg", "clipPath");
+      clip.setAttribute("id", clipId);
+      const clipRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      clipRect.setAttribute("width", String(w));
+      clipRect.setAttribute("height", String(h));
+      clipRect.setAttribute("rx", "4");
+      clip.appendChild(clipRect);
+      g.appendChild(clip);
 
       const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-      rect.setAttribute("width", String(n.w));
-      rect.setAttribute("height", String(n.h));
+      rect.setAttribute("width", String(w));
+      rect.setAttribute("height", String(h));
       rect.setAttribute("rx", "4");
 
       const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
       label.setAttribute("class", "label");
-      label.setAttribute("x", "10");
-      label.setAttribute("y", "18");
-      label.textContent = n.label;
+      label.setAttribute("x", "9");
+      label.setAttribute("y", "17");
+      label.setAttribute("clip-path", `url(#${clipId})`);
+      label.textContent = displayLabel;
+      if (n.label !== displayLabel) label.setAttribute("title", n.label);
 
       const ver = document.createElementNS("http://www.w3.org/2000/svg", "text");
       ver.setAttribute("class", "ver");
-      ver.setAttribute("x", "10");
-      ver.setAttribute("y", "32");
+      ver.setAttribute("x", "9");
+      ver.setAttribute("y", "31");
+      ver.setAttribute("clip-path", `url(#${clipId})`);
       if (n.verDanger) ver.setAttribute("fill", "#f05252");
-      ver.textContent = n.ver;
+      ver.textContent = displayVer;
+      if (n.ver !== displayVer) ver.setAttribute("title", n.ver);
 
       g.append(rect, label, ver);
       nodesG.appendChild(g);
@@ -259,34 +276,49 @@ function initMap(root: HTMLElement) {
         g.classList.add("dep-node-dragging");
         nodesG.appendChild(g);
         g.setPointerCapture(e.pointerId);
+        window.addEventListener("pointermove", onPointerMove);
+        window.addEventListener("pointerup", stopDragging);
+        window.addEventListener("pointercancel", stopDragging);
         canvas.classList.add("dep-map-dragging");
         if (n.id === "auth-legacy") {
-          dragBadge.classList.remove("hidden");
+          dragBadge?.classList.remove("hidden");
           positionDragBadge(e.clientX, e.clientY);
+        }
+        if (n.id === "migration-target") {
+          showToast("migration blocked");
+          addIncident("critical", "developer attempted to move migration-target");
         }
       });
     }
+  }
+
+  function pickLinkTarget(pool: string[]): string {
+    if (!pool.length) return "migration-target";
+    if (pool.includes("migration-target") && Math.random() < 0.4) return "migration-target";
+    return pick(pool);
+  }
+
+  function resolveLinkTarget(n: LegacyNode, nodeMap: Map<string, LegacyNode>): string | null {
+    if (n.linksTo && nodeMap.has(n.linksTo) && n.linksTo !== n.id) return n.linksTo;
+    if (n.id.startsWith("facade-") && nodeMap.has("migration-target")) return "migration-target";
+    if (n.id.startsWith("svc-") && nodeMap.has("migration-target")) return "migration-target";
+    return null;
   }
 
   function lineEl(d: string, className: string, extra?: Record<string, string>) {
     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
     path.setAttribute("d", d);
     path.setAttribute("class", className);
-    if (extra) {
-      for (const [k, v] of Object.entries(extra)) path.setAttribute(k, v);
-    }
+    if (extra) for (const [k, v] of Object.entries(extra)) path.setAttribute(k, v);
     return path;
   }
 
   function renderEdges() {
     edgesG.innerHTML = "";
-    blockedG.innerHTML = "";
-
     if (!nodes.has("migration-target") || !nodes.has("kafka-maybe")) return;
 
     const c = (id: string) => center(nodes.get(id)!);
     const j = getJunction(nodes);
-
     const pairs: [string, string, string][] = [
       ["monolith-core", "api-gateway", "dep-line"],
       ["api-gateway", "tmp_service_FINAL", "dep-line"],
@@ -309,49 +341,38 @@ function initMap(root: HTMLElement) {
 
     if (nodes.has("cron-v1-backup")) {
       const cron = c("cron-v1-backup");
-      const cpx = j.x + 40;
-      const cpy = j.y + 50;
-      edgesG.appendChild(
-        lineEl(`M ${j.x} ${j.y} Q ${cpx} ${cpy} ${cron.x} ${cron.y}`, "dep-line dep-line-loop"),
-      );
+      edgesG.appendChild(lineEl(`M ${j.x} ${j.y} Q ${j.x + 40} ${j.y + 50} ${cron.x} ${cron.y}`, "dep-line dep-line-loop"));
     }
 
-    const bx = j.x + 42;
-    const by = j.y - 42;
-    edgesG.appendChild(
-      lineEl(`M ${j.x} ${j.y} L ${bx} ${by}`, "", {
-        stroke: "#f05252",
-        "stroke-width": "1.5",
-        "stroke-dasharray": "3 3",
-        fill: "none",
-        opacity: "0.5",
-        "marker-end": "url(#dep-arrow)",
-      }),
-    );
-
-    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    text.setAttribute("x", String(bx + 5));
-    text.setAttribute("y", String(by - 2));
-    text.setAttribute("font-family", "JetBrains Mono, monospace");
-    text.setAttribute("font-size", "7");
-    text.setAttribute("fill", "#f05252");
-    text.textContent = "BLOCKED";
-    blockedG.appendChild(text);
-
-    // connect orphan simplify nodes to nearest chaos
     for (const n of nodes.values()) {
-      if (n.id.startsWith("facade-wrapper-")) {
-        const mig = center(nodes.get("migration-target")!);
-        const nc = center(n);
-        edgesG.appendChild(lineEl(`M ${nc.x} ${nc.y} L ${mig.x} ${mig.y}`, "dep-line dep-line-active"));
-      }
+      const targetId = resolveLinkTarget(n, nodes);
+      if (!targetId) continue;
+      const nc = center(n);
+      const tc = center(nodes.get(targetId)!);
+      const cls = n.id.startsWith("facade-") ? "dep-line dep-line-active" : "dep-line";
+      edgesG.appendChild(lineEl(`M ${nc.x} ${nc.y} L ${tc.x} ${tc.y}`, cls));
     }
   }
 
+  function renderLog() {
+    if (!logEl) return;
+    const incidents = getState().incidents.slice(0, 6);
+    logEl.innerHTML = incidents
+      .map(
+        (i) =>
+          `<p class="text-dim"><span class="text-dim/80">${formatIncidentTs(i.ts)}</span> <span class="text-amber">›</span> ${i.text}</p>`,
+      )
+      .join("");
+  }
+
   function render() {
-    renderEdges();
+    nodes = nodesMap();
+    updateCanvasSize();
     renderNodes();
+    renderEdges();
+    renderLog();
     checkCouplings();
+    requestAnimationFrame(positionBlockedToast);
   }
 
   function onPointerMove(e: PointerEvent) {
@@ -365,91 +386,162 @@ function initMap(root: HTMLElement) {
       n.x += (MIGRATION_HOME.x - n.x) * 0.04;
       n.y += (MIGRATION_HOME.y - n.y) * 0.04;
     }
-    clampNode(n);
+    ensureRoom(n);
+    clampNode(n, bounds);
     dragging.el.setAttribute("transform", `translate(${n.x}, ${n.y})`);
     renderEdges();
+    positionBlockedToast();
     checkCouplings();
     if (dragging.id === "auth-legacy") positionDragBadge(e.clientX, e.clientY);
   }
 
-  function onPointerUp(e: PointerEvent) {
+  function stopDragging(e: PointerEvent) {
     if (!dragging) return;
     const id = dragging.id;
     dragging.el.classList.remove("dep-node-dragging");
-    dragging.el.releasePointerCapture(e.pointerId);
+    try {
+      dragging.el.releasePointerCapture(e.pointerId);
+    } catch {
+      /* already released */
+    }
     dragging = null;
+    window.removeEventListener("pointermove", onPointerMove);
+    window.removeEventListener("pointerup", stopDragging);
+    window.removeEventListener("pointercancel", stopDragging);
     canvas.classList.remove("dep-map-dragging");
-    dragBadge.classList.add("hidden");
-    savePositions(nodes);
+    dragBadge?.classList.add("hidden");
+    persistNodes(nodes);
     if (id === "migration-target") startMigrationSnapBack();
   }
 
-  function autoLayout() {
-    stopMigrationSnap();
-    const ids = [...nodes.keys()];
-    // cluster everything on top of each other — worse is better
-    const cx = VB.w / 2 - 60;
-    const cy = VB.h / 2 - 22;
-    for (const id of ids) {
-      const n = nodes.get(id)!;
-      if (id === "migration-target") continue;
-      n.x = cx + (Math.random() - 0.5) * 90;
-      n.y = cy + (Math.random() - 0.5) * 70;
-      clampNode(n);
-    }
-    render();
-    appendLog("warn", "auto-layout applied: readability -47%");
-    startMigrationSnapBack();
+  function isNodeTarget(target: EventTarget | null) {
+    return target instanceof Element && !!target.closest(".dep-node-interactive");
   }
 
-  function simplifyArchitecture() {
-    simplifyCount++;
-    const id = `facade-wrapper-${simplifyCount}`;
-    nodes.set(id, {
-      id,
-      label: id,
-      ver: "narrows nothing",
-      x: 180 + simplifyCount * 8,
-      y: 120 + (simplifyCount % 3) * 18,
-      w: 130,
-      h: 44,
-      variant: "default",
+  function onViewportPointerDown(e: PointerEvent) {
+    if (dragging || isNodeTarget(e.target)) return;
+    if (e.button !== 0) return;
+    panning = {
+      startX: e.clientX,
+      startY: e.clientY,
+      scrollLeft: viewport.scrollLeft,
+      scrollTop: viewport.scrollTop,
+    };
+    viewport.classList.add("dep-map-panning");
+    viewport.setPointerCapture(e.pointerId);
+  }
+
+  function onViewportPointerMove(e: PointerEvent) {
+    if (!panning) return;
+    viewport.scrollLeft = panning.scrollLeft - (e.clientX - panning.startX);
+    viewport.scrollTop = panning.scrollTop - (e.clientY - panning.startY);
+  }
+
+  function onViewportPointerUp(e: PointerEvent) {
+    if (!panning) return;
+    panning = null;
+    viewport.classList.remove("dep-map-panning");
+    viewport.releasePointerCapture(e.pointerId);
+  }
+
+  viewport.addEventListener("pointerdown", onViewportPointerDown);
+  viewport.addEventListener("pointermove", onViewportPointerMove);
+  viewport.addEventListener("pointerup", onViewportPointerUp);
+  viewport.addEventListener("pointercancel", onViewportPointerUp);
+  viewport.addEventListener("scroll", positionBlockedToast);
+
+  root.querySelector(".dep-map-reset")?.addEventListener("click", () => {
+    stopMigrationSnap();
+    couplings.clear();
+    resetNodes();
+    render();
+    startMigrationSnapBack();
+  });
+
+  root.querySelector(".dep-map-autolayout")?.addEventListener("click", () => {
+    stopMigrationSnap();
+    const cx = bounds.w / 2 - 60;
+    const cy = bounds.h / 2 - 22;
+    for (const n of nodes.values()) {
+      if (n.id === "migration-target") continue;
+      n.x = cx + (Math.random() - 0.5) * (bounds.w * 0.45);
+      n.y = cy + (Math.random() - 0.5) * (bounds.h * 0.4);
+      clampNode(n, bounds);
+    }
+    persistNodes(nodes);
+    render();
+    const readability = 18 + Math.floor(Math.random() * 72);
+    addIncident("warn", `auto-layout applied: readability -${readability}%`);
+    startMigrationSnapBack();
+  });
+
+  root.querySelector(".dep-map-simplify")?.addEventListener("click", () => {
+    simplifyArchitectureAction();
+    render();
+  });
+
+  root.querySelector(".dep-map-migrate")?.addEventListener("click", () => {
+    deferMigration();
+    showToast("Rescheduled to Q4");
+    addIncident("critical", "migration run attempted — pipeline blocked");
+    startMigrationSnapBack();
+  });
+
+  root.querySelector(".dep-map-add-node")?.addEventListener("click", () => {
+    const label = pick(LEGACY_SYSTEM_NAMES);
+    const ver = "added manually";
+    const { w, h } = measureNode(label, ver);
+    const id = `svc-${Date.now().toString(36).slice(-6)}`;
+    const floorW = Math.max(MIN_VB.w, viewport.clientWidth || MIN_VB.w);
+    const peers = getState().nodes.map((n) => n.id);
+    const linksTo = pickLinkTarget(peers);
+    commit((s) => {
+      s.nodes.push({
+        id,
+        label,
+        ver,
+        x: 60 + Math.random() * (floorW - 220),
+        y: 60 + Math.random() * (MIN_VB.h - 140),
+        w,
+        h,
+        variant: "default",
+        linksTo,
+      });
     });
     render();
-    appendLog("ok", `architecture simplified: +1 node (${id})`);
-    checkCouplings();
-  }
+    const target = getState().nodes.find((n) => n.id === id)?.linksTo ?? linksTo;
+    addIncident("info", `node added: ${label} → ${target}`);
+  });
 
-  function runMigration() {
-    showToast("Rescheduled to Q4");
-    appendLog("blocked", "Rescheduled to Q4");
-    startMigrationSnapBack();
-  }
+  const unsub = subscribe(() => render());
+  root.addEventListener("astro:before-swap", unsub, { once: true });
 
-  function reset() {
-    stopMigrationSnap();
-    localStorage.removeItem(STORAGE_KEY);
-    simplifyCount = 0;
-    activeCouplings.clear();
-    nodes = defaultNodes();
-    renderLogs();
-    render();
-  }
+  const resizeObserver = new ResizeObserver(() => {
+    updateCanvasSize();
+    renderEdges();
+  });
+  resizeObserver.observe(viewport);
+  root.addEventListener("astro:before-swap", () => resizeObserver.disconnect(), { once: true });
 
-  svg.addEventListener("pointermove", onPointerMove);
-  svg.addEventListener("pointerup", onPointerUp);
-  svg.addEventListener("pointercancel", onPointerUp);
+  root.addEventListener("dep-map-resize", () => {
+    updateCanvasSize();
+    renderEdges();
+    positionBlockedToast();
+  });
 
-  resetBtn.addEventListener("click", reset);
-  autoLayoutBtn.addEventListener("click", autoLayout);
-  simplifyBtn.addEventListener("click", simplifyArchitecture);
-  migrateBtn.addEventListener("click", runMigration);
-
-  renderLogs();
   render();
   startMigrationSnapBack();
+
+  return { render };
 }
 
-export function initDependencyMaps() {
-  document.querySelectorAll<HTMLElement>("[data-dep-map]").forEach(initMap);
+const inited = new WeakSet<HTMLElement>();
+
+export function initDependencyMaps(force = false) {
+  document.querySelectorAll<HTMLElement>("[data-dep-map]").forEach((root) => {
+    if (inited.has(root) && !force) return;
+    if (force) inited.delete(root);
+    inited.add(root);
+    initMap(root);
+  });
 }

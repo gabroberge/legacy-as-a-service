@@ -53,10 +53,15 @@ const navLinks = [
             </li>
           ))}
         </ul>
-        <a href="#cta" class="shrink-0 rounded-md bg-amber px-3 py-2 font-mono text-[0.7rem] font-semibold text-bg transition hover:brightness-110 sm:px-3.5 sm:py-1.5">
-          <span class="sm:hidden">Defer</span>
-          <span class="hidden sm:inline">Defer Migration</span>
-        </a>
+        <div class="flex shrink-0 items-center gap-2">
+          <a href="/app" class="hidden rounded-md border border-white/12 px-3 py-1.5 font-mono text-[0.7rem] text-muted transition hover:border-amber hover:text-amber sm:inline-flex">
+            Control Plane
+          </a>
+          <a href="#cta" class="rounded-md bg-amber px-3 py-2 font-mono text-[0.7rem] font-semibold text-bg transition hover:brightness-110 sm:px-3.5 sm:py-1.5">
+            <span class="sm:hidden">Defer</span>
+            <span class="hidden sm:inline">Defer Migration</span>
+          </a>
+        </div>
       </nav>
       <div class="border-t border-white/7 lg:hidden">
         <ul class="flex gap-1 overflow-x-auto px-4 py-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -80,6 +85,7 @@ const navLinks = [
       <div class="container-page flex flex-col gap-4 text-[0.8125rem] text-dim sm:flex-row sm:items-center sm:justify-between">
         <span>© {new Date().getFullYear()} Legacy-as-a-Service — unchanged since 2019</span>
         <ul class="flex flex-wrap gap-x-5 gap-y-2">
+          <li><a href="/app" class="text-muted transition hover:text-[#e8eaef]">Control Plane</a></li>
           <li><a href="#" class="text-muted transition hover:text-[#e8eaef]">Status: Migration Blocked</a></li>
           <li><a href="#" class="text-muted transition hover:text-[#e8eaef]">Docs (deprecated)</a></li>
           <li><a href="#" class="text-muted transition hover:text-[#e8eaef]">Owner: unknown</a></li>

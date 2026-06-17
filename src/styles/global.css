@@ -147,13 +147,13 @@
 
   .dep-node .label {
     fill: #e4e6eb;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 500;
   }
 
   .dep-node .ver {
     fill: var(--color-dim);
-    font-size: 8px;
+    font-size: 7.5px;
   }
 
   .dep-node-interactive {
@@ -179,6 +179,46 @@
 
   .dep-map-canvas {
     user-select: none;
+  }
+
+  .dep-map-viewport {
+    max-height: min(360px, 55vh);
+    overflow: auto;
+    background: var(--color-inset);
+    scrollbar-width: thin;
+    scrollbar-color: rgba(232, 168, 56, 0.35) var(--color-inset);
+    cursor: grab;
+  }
+
+  .dep-map-viewport.dep-map-panning {
+    cursor: grabbing;
+    user-select: none;
+  }
+
+  .dep-map-viewport::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .dep-map-viewport::-webkit-scrollbar-track {
+    background: var(--color-inset);
+  }
+
+  .dep-map-viewport::-webkit-scrollbar-thumb {
+    background: rgba(232, 168, 56, 0.3);
+    border-radius: 4px;
+  }
+
+  .dep-map-viewport::-webkit-scrollbar-thumb:hover {
+    background: rgba(232, 168, 56, 0.5);
+  }
+
+  .dep-map-svg {
+    display: block;
+  }
+
+  .dep-map-bg {
+    cursor: grab;
   }
 
   .dep-map-log {
@@ -226,6 +266,36 @@
 
   .faq-item[open] .faq-icon {
     transform: rotate(45deg);
+  }
+
+  /* Control plane */
+  .cp-tabs {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(232, 168, 56, 0.3) transparent;
+  }
+
+  .cp-tab {
+    @apply shrink-0 cursor-pointer rounded-md border border-transparent px-3 py-2 font-mono text-xs text-muted transition;
+  }
+
+  .cp-tab:hover {
+    @apply border-white/12 text-[#e8eaef];
+  }
+
+  .cp-tab--active {
+    @apply border-amber/35 bg-amber/10 text-amber;
+  }
+
+  .cp-mini-btn {
+    @apply cursor-pointer rounded border border-white/12 bg-inset px-2 py-1 font-mono text-[0.65rem] text-dim transition hover:border-amber/40 hover:text-amber;
+  }
+
+  .cp-action-btn {
+    @apply cursor-pointer rounded-md border border-white/12 bg-inset px-3 py-2 font-mono text-xs text-[#e8eaef] transition hover:border-amber/40 hover:bg-amber/5 hover:text-amber;
+  }
+
+  .cp-action-btn--danger {
+    @apply border-danger/30 text-danger hover:border-danger hover:bg-danger/10 hover:text-danger;
   }
 }
 

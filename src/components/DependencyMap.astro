@@ -1,4 +1,9 @@
 ---
+interface Props {
+  showAddNode?: boolean;
+}
+
+const { showAddNode = false } = Astro.props;
 ---
 
 <div
@@ -15,7 +20,7 @@
       <span class="truncate">legacy-dependency-map.graph</span>
     </div>
     <div class="flex flex-wrap items-center gap-2">
-      <span class="dep-map-hint hidden text-xs text-dim md:inline">drag nodes to inspect dependency ownership</span>
+      <span class="dep-map-hint hidden text-xs text-dim md:inline">drag nodes · scroll map</span>
       <button
         type="button"
         class="dep-map-reset rounded border border-white/12 px-2 py-1 text-xs text-dim transition hover:border-amber hover:text-amber"
@@ -36,9 +41,14 @@
     <button type="button" class="dep-map-migrate col-span-2 rounded border border-danger/35 bg-danger/10 px-2 py-1.5 font-mono text-xs text-danger transition hover:border-danger hover:bg-danger/20 sm:col-span-1 sm:py-0.5">
       Run migration
     </button>
+    {showAddNode && (
+      <button type="button" class="dep-map-add-node col-span-2 rounded border border-white/12 px-2 py-1.5 font-mono text-xs text-dim transition hover:border-amber hover:text-amber sm:col-span-1 sm:py-0.5">
+        Add node
+      </button>
+    )}
   </div>
 
-  <div class="dep-map-canvas relative min-h-[280px] select-none p-3 sm:min-h-[340px] sm:p-4">
+  <div class="dep-map-canvas relative select-none">
     <div
       class="dep-drag-badge pointer-events-none absolute z-20 hidden rounded border border-danger/40 bg-danger/15 px-2 py-0.5 font-mono text-[0.6rem] font-semibold tracking-wider text-danger uppercase"
       data-drag-badge
@@ -49,16 +59,25 @@
       class="dep-toast pointer-events-none absolute top-3 left-1/2 z-20 hidden -translate-x-1/2 rounded border border-amber/40 bg-bg/95 px-3 py-1.5 font-mono text-[0.65rem] text-amber shadow-lg"
       data-toast
     ></div>
-    <svg class="dep-map-svg block h-auto w-full touch-none" viewBox="0 0 480 300" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <marker id="dep-arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-          <path d="M0,0 L6,3 L0,6" fill="#f05252" />
-        </marker>
-      </defs>
-      <g class="dep-edges" data-dep-edges></g>
-      <g class="dep-nodes" data-dep-nodes></g>
-      <g class="dep-blocked-label" data-dep-blocked></g>
-    </svg>
+    <div
+      class="dep-blocked-toast pointer-events-none absolute z-20 hidden whitespace-nowrap rounded border border-danger/40 bg-bg/95 px-2.5 py-1 font-mono text-[0.62rem] font-semibold tracking-wide text-danger uppercase shadow-lg"
+      data-blocked-toast
+    >
+      migration blocked
+    </div>
+    <div class="dep-map-viewport" data-dep-viewport>
+      <svg
+        class="dep-map-svg block"
+        width="900"
+        height="600"
+        viewBox="0 0 900 600"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <rect class="dep-map-bg" width="900" height="600" fill="transparent" />
+        <g class="dep-edges" data-dep-edges></g>
+        <g class="dep-nodes" data-dep-nodes></g>
+      </svg>
+    </div>
   </div>
 
   <div class="dep-map-log flex max-h-24 flex-col gap-0.5 overflow-y-auto border-t border-white/7 bg-inset px-3.5 py-2 font-mono text-xs leading-snug text-dim" data-dep-log></div>

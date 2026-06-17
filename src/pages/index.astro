@@ -1,6 +1,10 @@
 ---
-import Layout from "../layouts/Layout.astro";
 import DependencyMap from "../components/DependencyMap.astro";
+import Layout from "../layouts/Layout.astro";
+import { COMPLIANCE_BADGES, DASHBOARD_METRICS } from "../lib/content-pool";
+
+const metrics = DASHBOARD_METRICS.slice(0, 5);
+const complianceBadges = COMPLIANCE_BADGES.slice(0, 8);
 
 const features = [
   {
@@ -51,14 +55,6 @@ const features = [
     status: "blocked",
     statusLabel: "Migration blocked",
   },
-];
-
-const metrics = [
-  { key: "review_noise", value: "+47%", note: "low-context review comments", tone: "text-amber" },
-  { key: "onboard_dur", value: "3.8x", note: "slower onboarding vs baseline", tone: "text-danger" },
-  { key: "conventions", value: "12", note: "obsolete conventions preserved", tone: "text-terminal" },
-  { key: "ownership", value: "0", note: "clarified ownership boundaries", tone: "text-dim" },
-  { key: "alignment", value: "98%", note: "stakeholder alignment theatre", tone: "text-amber" },
 ];
 
 const plans = [
@@ -136,7 +132,7 @@ const faqs = [
   },
   {
     q: "Can we keep our old naming conventions forever?",
-    a: "Convention Preservation Engine actively resists modification. `data2_final_new` is protected.",
+    a: "Convention Preservation Engine actively resists modification. `customer-sync-daemon` is protected.",
   },
 ];
 
@@ -167,7 +163,7 @@ const statusTagClass: Record<string, string> = {
             risk of actually fixing anything.
           </p>
           <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <a href="#cta" class="btn btn-primary w-full sm:w-auto">Request a Migration Delay</a>
+            <a href="/app" class="btn btn-primary w-full sm:w-auto">Open Control Plane</a>
             <a href="#metrics" class="btn btn-secondary w-full sm:w-auto">View Debt Telemetry</a>
           </div>
           <div class="flex flex-col gap-1.5 font-mono text-xs text-dim sm:flex-row sm:flex-wrap sm:gap-4">
@@ -315,6 +311,26 @@ const statusTagClass: Record<string, string> = {
           <span>last_sync: never (by design)</span>
           <span>source: internal_estimates.vibes</span>
           <span>retention: indefinite</span>
+        </div>
+      </div>
+
+      <div class="mt-6 overflow-hidden rounded-[10px] border border-white/12 bg-panel">
+        <div class="border-b border-white/7 bg-inset px-4 py-2.5 font-mono text-[0.68rem] text-muted">
+          laas-compliance / badges
+        </div>
+        <div class="flex flex-wrap gap-2 p-4">
+          {complianceBadges.map((b) => (
+            <span
+              class:list={[
+                "rounded border px-2.5 py-1 font-mono text-[0.65rem] uppercase",
+                b.status === "valid" && "border-terminal/30 bg-terminal/10 text-terminal",
+                b.status === "pending" && "border-amber/35 bg-amber/10 text-amber",
+                b.status === "expired" && "border-danger/30 bg-danger/10 text-danger",
+              ]}
+            >
+              {b.label}
+            </span>
+          ))}
         </div>
       </div>
     </div>
