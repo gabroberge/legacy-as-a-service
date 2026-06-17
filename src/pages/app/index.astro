@@ -1,0 +1,135 @@
+---
+import AppLayout from "../../layouts/AppLayout.astro";
+import DependencyMap from "../../components/DependencyMap.astro";
+import { COMPLIANCE_BADGES } from "../../lib/content-pool";
+
+const tabs = [
+  { id: "overview", label: "Overview" },
+  { id: "deps", label: "Dependency Map" },
+  { id: "refactors", label: "Refactor Queue" },
+  { id: "conventions", label: "Conventions" },
+  { id: "reviews", label: "AI Review Noise" },
+  { id: "incidents", label: "Incident Log" },
+];
+---
+
+<AppLayout>
+  <div id="cp-root" class="relative z-10 mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
+    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <p class="mb-1 font-mono text-xs tracking-wider text-amber uppercase">Control Plane</p>
+        <h1 class="text-xl font-bold sm:text-2xl">Legacy Debt Operations</h1>
+        <p class="mt-1 text-sm text-muted">Manage systems, deferrals, conventions, and review noise — locally.</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2 font-mono text-xs text-dim">
+        <span class="rounded border border-white/12 px-2 py-1">cluster: local</span>
+        <span class="rounded border border-danger/30 bg-danger/10 px-2 py-1 text-danger">blockers: <span data-cp-blockers>3</span></span>
+        <button type="button" class="cp-mini-btn text-danger!" data-action-reset>Reset state</button>
+      </div>
+    </div>
+
+    <nav class="cp-tabs mb-6 flex gap-1 overflow-x-auto pb-1" role="tablist" aria-label="Control plane sections">
+      {tabs.map((tab, i) => (
+        <button
+          type="button"
+          role="tab"
+          class:list={["cp-tab", i === 0 && "cp-tab--active"]}
+          data-cp-tab={tab.id}
+          aria-selected={i === 0}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </nav>
+
+    <!-- Overview -->
+    <section class="cp-panel" data-cp-panel="overview">
+      <div class="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3" data-cp-metrics></div>
+
+      <div class="mb-6 flex flex-wrap gap-2">
+        {COMPLIANCE_BADGES.slice(0, 6).map((b) => (
+          <span
+            class:list={[
+              "rounded border px-2 py-0.5 font-mono text-[0.6rem] uppercase",
+              b.status === "valid" && "border-terminal/30 bg-terminal/10 text-terminal",
+              b.status === "pending" && "border-amber/35 bg-amber/10 text-amber",
+              b.status === "expired" && "border-danger/30 bg-danger/10 text-danger",
+            ]}
+          >
+            {b.id}
+          </span>
+        ))}
+      </div>
+
+      <div class="mb-6 grid gap-4 lg:grid-cols-2">
+        <div class="rounded-md border border-white/12 bg-panel p-4">
+          <h2 class="mb-3 font-mono text-xs tracking-wider text-dim uppercase">Quick Actions</h2>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" class="cp-action-btn" data-action-defer>Defer Migration</button>
+            <button type="button" class="cp-action-btn" data-action-ai>Run AI Review</button>
+            <button type="button" class="cp-action-btn" data-action-ownership>Clarify Ownership</button>
+            <button type="button" class="cp-action-btn" data-action-simplify>Simplify Architecture</button>
+            <button type="button" class="cp-action-btn" data-action-preserve>Preserve Convention</button>
+            <button type="button" class="cp-action-btn cp-action-btn--danger" data-action-blocker>Generate Blocker</button>
+          </div>
+        </div>
+        <div class="rounded-md border border-white/12 bg-panel p-4">
+          <h2 class="mb-3 font-mono text-xs tracking-wider text-dim uppercase">Recent Incidents</h2>
+          <div class="flex max-h-40 flex-col gap-1.5 overflow-y-auto" data-cp-overview-incidents></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dependency Map -->
+    <section class="cp-panel" data-cp-panel="deps" hidden>
+      <p class="mb-4 text-sm text-muted">Drag nodes to inspect accidental coupling. Positions persist in localStorage.</p>
+      <DependencyMap showAddNode />
+    </section>
+
+    <!-- Refactor Queue -->
+    <section class="cp-panel" data-cp-panel="refactors" hidden>
+      <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <h2 class="font-mono text-xs tracking-wider text-dim uppercase">Refactor Deferral Pipeline</h2>
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" class="cp-action-btn" data-action-propose-refactor>Propose refactor</button>
+          <span class="tag tag--defer">Q4 ready</span>
+        </div>
+      </div>
+      <div class="grid gap-3" data-cp-refactors></div>
+    </section>
+
+    <!-- Conventions -->
+    <section class="cp-panel" data-cp-panel="conventions" hidden>
+      <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <h2 class="font-mono text-xs tracking-wider text-dim uppercase">Convention Preservation Registry</h2>
+        <button type="button" class="cp-action-btn" data-action-discover-convention>Discover convention</button>
+      </div>
+      <div class="overflow-x-auto rounded-md border border-white/12 bg-panel" data-cp-conventions></div>
+    </section>
+
+    <!-- AI Review -->
+    <section class="cp-panel" data-cp-panel="reviews" hidden>
+      <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="font-mono text-xs tracking-wider text-dim uppercase">AI Review Noise</h2>
+          <p class="mt-1 text-sm text-muted">Classify low-context comments to update telemetry.</p>
+        </div>
+        <button type="button" class="cp-action-btn" data-action-run-review>Run AI Review</button>
+      </div>
+      <div class="overflow-hidden rounded-md border border-white/12 bg-panel" data-cp-reviews></div>
+    </section>
+
+    <!-- Incident Log -->
+    <section class="cp-panel" data-cp-panel="incidents" hidden>
+      <h2 class="mb-4 font-mono text-xs tracking-wider text-dim uppercase">Incident Log</h2>
+      <div class="max-h-[60vh] space-y-1.5 overflow-y-auto rounded-md border border-white/12 bg-inset p-4 font-mono text-xs" data-cp-incidents></div>
+    </section>
+  </div>
+</AppLayout>
+
+<script>
+  import { initControlPlane } from "../../scripts/control-plane";
+
+  initControlPlane();
+  document.addEventListener("astro:page-load", initControlPlane);
+</script>
