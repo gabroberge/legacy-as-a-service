@@ -1,0 +1,73 @@
+name: Incident Report
+description: File an incident. 62% are classified as noise (load-bearing metric).
+title: "[INCIDENT] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for filing. This project is absurd by design.
+        If migration is blocked, that is working as designed.
+
+  - type: dropdown
+    id: classification
+    attributes:
+      label: Expected classification
+      description: Honest guess. Triage may disagree.
+      options:
+        - Feature — migration blocked
+        - Feature — refactor deferred
+        - Feature — AI review lacks context
+        - Convention — preserve as-is
+        - Incident — staging parity
+        - Noise
+    validations:
+      required: true
+
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Affected surface
+      options:
+        - Landing (`/`)
+        - Control Plane (`/app`)
+        - Dependency Map
+        - Refactor Queue
+        - Conventions
+        - AI Review Noise
+        - Incident Log
+        - Docs / GitHub templates
+        - Other / unknown
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Write like you have been in the system for nine years.
+      placeholder: "Migration blocked after Q4. Arrow still load-bearing. Owner: unknown."
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. bun dev
+        2. Open /app
+        3. Attempt migration
+        4. Observe blocked toast (expected)
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Acknowledgements
+      options:
+        - label: I have read CONTRIBUTING.md and I am not trying to unblock the migration
+          required: true
+        - label: I accept this may be closed as working as designed
+          required: false

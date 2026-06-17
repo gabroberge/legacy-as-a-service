@@ -63,6 +63,7 @@ If your issue does not fit, it will be classified as **noise** (62% load-bearing
 bun install
 bun dev       # http://localhost:4321
 bun build     # must pass before merge
+bun test      # migration must remain blocked (initialization requirement)
 ```
 
 **Prerequisites:** Node ≥22.12, Bun, tolerance.
