@@ -1,0 +1,42 @@
+{
+  "name": "legacy-as-a-service",
+  "description": "Absurd-by-design satirical enterprise platform for preserving, deferring, and ceremonially migrating legacy systems. Static Astro site. Migration blocked.",
+  "type": "module",
+  "version": "0.0.1",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gabroberge/legacy-as-a-service.git"
+  },
+  "homepage": "https://gabroberge.github.io/legacy-as-a-service/",
+  "bugs": {
+    "url": "https://github.com/gabroberge/legacy-as-a-service/issues"
+  },
+  "keywords": [
+    "astro",
+    "enterprise",
+    "legacy",
+    "satire",
+    "static-site",
+    "technical-debt"
+  ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.1",
+    "astro": "^6.4.7",
+    "tailwindcss": "^4.3.1"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.4"
+  }
+}
