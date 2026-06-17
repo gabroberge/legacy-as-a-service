@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Migration blocked (working as designed)
+    url: https://github.com/gabroberge/legacy-as-a-service/blob/master/README.md
+    about: Read the README first. Most tickets are classified as noise.
+  - name: Contributing guide
+    url: https://github.com/gabroberge/legacy-as-a-service/blob/master/CONTRIBUTING.md
+    about: How to contribute without accidentally fixing the joke.

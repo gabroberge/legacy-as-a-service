@@ -1,0 +1,42 @@
+[
+  {
+    "name": "noise",
+    "color": "8b949e",
+    "description": "62% load-bearing classification — low signal, preserved"
+  },
+  {
+    "name": "feature: blocked",
+    "color": "b62324",
+    "description": "Migration blocked or pipeline blocked — working as designed"
+  },
+  {
+    "name": "convention",
+    "color": "8957e5",
+    "description": "Preserve as-is; do not refactor for maintainability"
+  },
+  {
+    "name": "q4",
+    "color": "d29922",
+    "description": "Deferred to next planning cycle (recurring)"
+  },
+  {
+    "name": "working-as-designed",
+    "color": "3fb950",
+    "description": "Initialization requirement; close as feature"
+  },
+  {
+    "name": "incident",
+    "color": "d18616",
+    "description": "Staging parity, breakage, or site works on my machine"
+  },
+  {
+    "name": "enhancement",
+    "color": "0969da",
+    "description": "New enterprise theatre — content, copy, interactions"
+  },
+  {
+    "name": "triage",
+    "color": "c5def5",
+    "description": "Awaiting classification per LaaS incident taxonomy"
+  }
+]

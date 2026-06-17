@@ -1,0 +1,51 @@
+name: Enhancement / Content
+description: Propose new enterprise theatre — blockers, copy, conventions, refactors.
+title: "[ENHANCEMENT] "
+labels: ["enhancement", "q4"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Enhancements welcome if they sound like they could ship on a real vendor site unironically.
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Enhancement type
+      options:
+        - Content pool entry (blocker, incident, convention, refactor, AI comment)
+        - Control plane interaction
+        - Landing / marketing copy
+        - UX (without removing existential dread)
+        - Documentation (README, CONTRIBUTING, templates)
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: What should exist? Why will it be deferred?
+      placeholder: |
+        Add refactor: "Replace SOAP gateway wrapper with anything else"
+        Status: Blocked. Reason: Partner still sends XML by fax metaphor.
+    validations:
+      required: true
+
+  - type: textarea
+    id: sample
+    attributes:
+      label: Sample copy (optional)
+      description: Draft the enterprise copy if you have it.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: conventions
+    attributes:
+      label: Convention check
+      options:
+        - label: This preserves or discovers at least one undocumented convention
+          required: true
+        - label: I am not proposing to split content-pool-bulk.ts
+          required: true
