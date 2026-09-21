@@ -1,13 +1,53 @@
 #!/usr/bin/env bash
-# Configure GitHub repository security settings for legacy-as-a-service.
-# Requires: gh auth login (repo scope)
+# Configure GitHub repository security and branch protection for master + dev.
+# Requires: gh auth login (repo + admin:repo_hook scopes as needed)
 set -euo pipefail
 
 REPO="${1:-gabroberge/legacy-as-a-service}"
-BRANCH="${2:-master}"
 CI_CHECK="Dependencies resolve; architecture does not"
+if [[ $# -le 1 ]]; then
+	BRANCHES=(master dev)
+else
+	shift
+	BRANCHES=("$@")
+fi
 
-echo "→ Repository: $REPO (branch: $BRANCH)"
+ensure_branch() {
+	local branch="$1"
+	if gh api "repos/${REPO}/branches/${branch}" >/dev/null 2>&1; then
+		return
+	fi
+	echo "→ Creating missing branch ${branch} from default…"
+	local default_branch sha
+	default_branch=$(gh api "repos/${REPO}" -q .default_branch)
+	sha=$(gh api "repos/${REPO}/git/ref/heads/${default_branch}" -q .object.sha)
+	gh api --method POST "repos/${REPO}/git/refs" \
+		-f ref="refs/heads/${branch}" \
+		-f sha="${sha}" >/dev/null
+}
+
+protect_branch() {
+	local branch="$1"
+	echo "→ Applying branch protection on ${branch}…"
+	gh api --method PUT "repos/${REPO}/branches/${branch}/protection" \
+		--input - <<EOF
+{
+  "required_status_checks": {
+    "strict": true,
+    "contexts": ["${CI_CHECK}"]
+  },
+  "enforce_admins": false,
+  "required_pull_request_reviews": null,
+  "restrictions": null,
+  "allow_force_pushes": false,
+  "allow_deletions": false,
+  "block_creations": false,
+  "required_conversation_resolution": false
+}
+EOF
+}
+
+echo "→ Repository: $REPO (branches: ${BRANCHES[*]})"
 
 echo "→ Enabling Dependabot vulnerability alerts…"
 gh api --method PUT "repos/${REPO}/vulnerability-alerts" >/dev/null
@@ -17,7 +57,7 @@ gh api --method PUT "repos/${REPO}/automated-security-fixes" >/dev/null
 
 echo "→ Setting Actions workflow token to read-only by default…"
 gh api --method PUT "repos/${REPO}/actions/permissions/workflow" \
-  --input - <<'EOF'
+	--input - <<'EOF'
 {
   "default_workflow_permissions": "read",
   "can_approve_pull_request_reviews": false
@@ -63,43 +103,31 @@ EOF
 
 echo "→ Setting repository topics…"
 gh api --method PUT "repos/${REPO}/topics" \
-  --input - <<'EOF'
+	--input - <<'EOF'
 {
   "names": ["satire", "legacy", "astro", "technical-debt", "enterprise", "static-site"]
 }
 EOF
 
-echo "→ Applying branch protection on ${BRANCH}…"
-gh api --method PUT "repos/${REPO}/branches/${BRANCH}/protection" \
-  --input - <<EOF
-{
-  "required_status_checks": {
-    "strict": true,
-    "contexts": ["${CI_CHECK}"]
-  },
-  "enforce_admins": false,
-  "required_pull_request_reviews": null,
-  "restrictions": null,
-  "allow_force_pushes": false,
-  "allow_deletions": false,
-  "block_creations": false,
-  "required_conversation_resolution": false
-}
-EOF
+for branch in "${BRANCHES[@]}"; do
+	ensure_branch "$branch"
+	protect_branch "$branch"
+done
 
 echo "→ Triggering label sync workflow…"
 gh workflow run labels.yml -R "$REPO" 2>/dev/null || echo "   labels workflow not found on default branch yet"
 
+PAGES_BRANCH="${BRANCHES[0]}"
 echo "→ Enabling GitHub Pages (workflow source)…"
 if gh api "repos/${REPO}/pages" >/dev/null 2>&1; then
-  gh api --method PUT "repos/${REPO}/pages" --input - <<EOF >/dev/null
+	gh api --method PUT "repos/${REPO}/pages" --input - <<EOF >/dev/null
 { "build_type": "workflow" }
 EOF
 else
-  gh api --method POST "repos/${REPO}/pages" --input - <<EOF
+	gh api --method POST "repos/${REPO}/pages" --input - <<EOF
 {
   "build_type": "workflow",
-  "source": { "branch": "${BRANCH}", "path": "/" }
+  "source": { "branch": "${PAGES_BRANCH}", "path": "/" }
 }
 EOF
 fi
@@ -110,7 +138,7 @@ echo "→ Triggering Pages deploy…"
 gh workflow run deploy.yml -R "$REPO" 2>/dev/null || echo "   deploy workflow not on default branch yet — push first"
 
 echo ""
-echo "Done. Optional / UI-only (see SECURITY.md):"
+echo "Done. Optional / UI-only:"
 echo "  • Settings → Actions → Fork PR workflows → require approval for outside contributors"
 echo "  • Branch protection → require PR before merge (solo maintainer: optional)"
 echo "  • Branch protection → enforce for administrators (stricter lockdown)"
